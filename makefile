@@ -7,7 +7,7 @@ clean:
 
 compiler: 
 	@printf "\e[32m--------| \e[1;32mCompilation of all your .cpp\e[0m\e[32m |--------\e[0m\n\n"
-	clang++ -std=c++23  main.cpp -o out.bin
+	clang++ -std=c++23  src/main.cpp -o out.bin
 	@printf "\e[32m\tDONE\e[0m\n"
 
 test: compiler
