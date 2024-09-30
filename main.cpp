@@ -18,8 +18,8 @@ bool VERBOSE = false;
 
 auto print_release = []
 {
-    std::cout << Config::RELEASE << '\n'
-              << Config::COPYRIGHT << '\n';
+    std::cout << RELEASE << '\n'
+              << COPYRIGHT << '\n';
 };
 
 auto failure = [](std::string_view message)
@@ -48,7 +48,7 @@ auto print_help = []()
 
 int main(int argc, char **argv)
 {
-    std::cout << "🤗  | Welcome in \033[1m" << Config::PROGNAME << "\033[0m | 🤗" << std::endl;
+    std::cout << "🤗  | Welcome in \033[1m" << PROGNAME << "\033[0m | 🤗" << std::endl;
     print_release();
     std::cout << std::endl
               << std::endl;
@@ -69,10 +69,6 @@ int main(int argc, char **argv)
         {
             print_release();
             exit(0);
-        }
-        else if (!strcmp(argv[i], "-V") || !strcmp(argv[i], "--verbose"))
-        {
-            VERBOSE = true;
         }
         else
         { // ALL OTHER ARGUMENT
