@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <string.h>
-#include "parser.hpp"
+#include "../include/Electre.hpp"
 
 std::string PROGNAME = "TBA";
 std::string RELEASE = "Revision 0.1 | Last update 30 Sept 2024";
@@ -95,14 +95,35 @@ int main(int argc, char **argv)
         }
     }
 
-    if (isFile)
-    {
-        Parser parser(',');
-        parser.parseFile(filename);
-        parser.print();
+    std::vector<std::vector<int>> values{
+        std::vector<int> {4500, 7, 7, 8},
+        std::vector<int> {4000, 7, 3, 8},
+        std::vector<int> {4000, 5, 7, 8},
+        std::vector<int> {3500, 5, 7, 5},
+        std::vector<int> {3500, 5, 7, 8},
+        std::vector<int> {3500, 3, 3, 8},
+        std::vector<int> {2500, 3, 7, 5},
+    };
+
+    std::vector<float> weights{
+        5.0, 3.0, 1.0, 1.0
+    };
+
+    float concordanceThreshold = 0.7;
+
+    std::cout << "Values matrix:" << std::endl;
+    for (std::vector<int> vec : values) {
+        for (int val : vec) 
+            std::cout << val << " ";
+        std::cout << std::endl;
     }
 
-    std::cout << "👋 Goodbye 👋" << std::endl;
+    std::cout << "Weights matrix:" << std::endl;
+    for (float val : weights)
+        std::cout << val << " ";
+    std::cout << std::endl;
+
+    Electre el(values, weights, concordanceThreshold);
 
     return 0;
 }
