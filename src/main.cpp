@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <string.h>
+#include "parser.hpp"
 
 
 std::string PROGNAME = "TBA";
@@ -46,8 +47,16 @@ auto print_help = []()
     exit(0);
 };
 
+void printVector(const std::vector<int>& vec) {
+    for (const auto& num : vec) {
+        std::cout << num << std::endl;
+    }
+}
+
 int main(int argc, char **argv)
 {
+    // Parser parser(',');
+    // printVector(parser.parseFile("data/donnees.csv")[0]);
     std::cout << "🤗  | Welcome in \033[1m" << PROGNAME << "\033[0m | 🤗" << std::endl;
     print_release();
     std::cout << std::endl
