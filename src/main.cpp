@@ -33,7 +33,8 @@ void print_usage()
               << "\033[1mUsage: \033[0m" << PROGNAME << " | [-h | --help] | [-v | --version] " << std::endl
               << "          -h | --help                     Help" << std::endl
               << "          -v | --version                  Version" << std::endl
-              << "          -f | --file                     Help" << std::endl;
+              << "          -d | --data                     Path to data CSV file" << std::endl
+              << "          -w | --weight                   Path to weight CSV file" << std::endl;
 };
 
 auto print_help = []()
@@ -55,6 +56,9 @@ int main(int argc, char **argv)
     std::string filename = "";
     bool isFile = false;
 
+    std::string filenameWeight = "";
+    bool isWeightFile = false;
+
     // Arg parser
     if (argc < 0) // number of arg minimum
         failure("One argument required. \n\t-h for help");
@@ -71,10 +75,15 @@ int main(int argc, char **argv)
             print_release();
             exit(0);
         }
-        else if (!strcmp(argv[i], "-f") || !strcmp(argv[i], "--file"))
+        else if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--data"))
         {
             filename = argv[++i];
             isFile = true;
+        }
+        else if (!strcmp(argv[i], "-w") || !strcmp(argv[i], "--weight"))
+        {
+            filenameWeight = argv[++i];
+            isWeightFile = true;
         }
         else
         { // ALL OTHER ARGUMENT
