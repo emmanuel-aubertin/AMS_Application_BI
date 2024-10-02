@@ -9,6 +9,7 @@ class Electre {
         std::vector<std::vector<int>> values;
         std::vector<float> weights;
         std::vector<float> vetos;
+
         std::vector<std::vector<float>> concordance;
         std::vector<std::vector<bool>> nonDiscordance;
         std::vector<int> kernel;
@@ -18,7 +19,7 @@ class Electre {
         void processNondiscordance();
     public:
         Electre(std::vector<std::vector<int>> values, std::vector<float> weights, std::vector<float> vetos, float concordanceThreshold);
-        // ~Electre();
+        Electre(std::vector<std::vector<int>> values, std::vector<float> weights, float concordanceThreshold);
         
         std::vector<int> getKernel();
 };

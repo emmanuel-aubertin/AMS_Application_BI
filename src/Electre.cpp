@@ -20,7 +20,7 @@ void Electre::processMatrixes() {
 
 void Electre::processConcordance() {
     int size = concordance.size();
-    for (int y=0; y<size-1; y++) {
+    for (int y=0; y<size-1; y++)
         for (int x=y+1; x<size; x++) {
             int concordVal1 = 0; 
             int concordVal2 = 0;
@@ -76,9 +76,6 @@ void Electre::processNondiscordance() {
         std::cout << std::endl;
     }
 }
-
-
-
 
 std::vector<int> Electre::getKernel() {
     return kernel;
