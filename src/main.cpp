@@ -53,11 +53,13 @@ int main(int argc, char **argv)
     print_release();
     std::cout << std::endl
               << std::endl;
+  
     std::string filename = "";
     bool isFile = false;
 
     std::string filenameWeight = "";
     bool isWeightFile = false;
+
 
     // Arg parser
     if (argc < 0) // number of arg minimum
@@ -101,5 +103,6 @@ int main(int argc, char **argv)
     }
 
     std::cout << "👋 Goodbye 👋" << std::endl;
+
     return 0;
 }
