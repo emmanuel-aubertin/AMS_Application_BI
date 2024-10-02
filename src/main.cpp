@@ -7,14 +7,13 @@
 
 #include <iostream>
 #include <string.h>
-
+#include "parser.hpp"
 
 std::string PROGNAME = "TBA";
 std::string RELEASE = "Revision 0.1 | Last update 30 Sept 2024";
 std::string AUTHOR = "\033[1mAubertin Emmanuel, Ange Cure, Jerome Chen\033[0m";
-std::string COPYRIGHT = "(c) 2024 " + AUTHOR + " from https://github.com/emmanuel-aubertin/AMS_Application_BI";
+std::string COPYRIGHT = "(c) 2024 " + AUTHOR + " from https://github.com/SkyInSightTeam";
 bool VERBOSE = false;
-
 
 auto print_release = []
 {
@@ -33,7 +32,9 @@ void print_usage()
               << PROGNAME << " by " << AUTHOR << std::endl
               << "\033[1mUsage: \033[0m" << PROGNAME << " | [-h | --help] | [-v | --version] " << std::endl
               << "          -h | --help                     Help" << std::endl
-              << "          -v | --version                  Version" << std::endl;
+              << "          -v | --version                  Version" << std::endl
+              << "          -d | --data                     Path to data CSV file" << std::endl
+              << "          -w | --weight                   Path to weight CSV file" << std::endl;
 };
 
 auto print_help = []()
@@ -52,7 +53,13 @@ int main(int argc, char **argv)
     print_release();
     std::cout << std::endl
               << std::endl;
+  
     std::string filename = "";
+    bool isFile = false;
+
+    std::string filenameWeight = "";
+    bool isWeightFile = false;
+
 
     // Arg parser
     if (argc < 0) // number of arg minimum
@@ -70,6 +77,16 @@ int main(int argc, char **argv)
             print_release();
             exit(0);
         }
+        else if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--data"))
+        {
+            filename = argv[++i];
+            isFile = true;
+        }
+        else if (!strcmp(argv[i], "-w") || !strcmp(argv[i], "--weight"))
+        {
+            filenameWeight = argv[++i];
+            isWeightFile = true;
+        }
         else
         { // ALL OTHER ARGUMENT
             print_usage();
@@ -78,6 +95,14 @@ int main(int argc, char **argv)
         }
     }
 
+    if (isFile)
+    {
+        Parser parser(',');
+        parser.parseFile(filename);
+        parser.print();
+    }
+
+    std::cout << "👋 Goodbye 👋" << std::endl;
 
     return 0;
 }
