@@ -21,7 +21,6 @@ private:
 
 public:
     Electre(std::vector<std::vector<float>> values, std::vector<float> weights, std::vector<float> vetos, float concordanceThreshold);
-    Electre(std::vector<std::vector<float>> values, std::vector<float> weights, float concordanceThreshold);
 
     std::vector<float> getKernel();
 };

@@ -7,28 +7,6 @@
  *
  * @param values A 2D vector representing the decision matrix, where each inner vector represents a row.
  * @param weights A vector of floating-point numbers representing the weights for each attribute.
- * @param concordanceThreshold A floating-point number representing the threshold for concordance.
- */
-Electre::Electre(std::vector<std::vector<float>> values, std::vector<float> weights, float concordanceThreshold)
-{
-    this->values = values;
-    this->weights = weights;
-
-    int size = values.size();
-    concordance = std::vector<std::vector<float>>(size, std::vector<float>(size, 0.0));
-    nonDiscordance = std::vector<std::vector<bool>>(size, std::vector<bool>(size, true));
-
-    // process values
-    this->processMatrixes();
-}
-
-/**
- * @brief Constructs an Electre object.
- *
- * Initializes the Electre object with the provided values, weights, and concordance threshold.
- *
- * @param values A 2D vector representing the decision matrix, where each inner vector represents a row.
- * @param weights A vector of floating-point numbers representing the weights for each attribute.
  * @param vetos A vector of floating-point numbers representing the veto thresholds for each attribute.
  * @param concordanceThreshold A floating-point number representing the threshold for concordance.
  */
@@ -54,6 +32,7 @@ void Electre::processMatrixes()
     processConcordance();
     processNondiscordance();
 }
+
 
 /**
  * @brief Calculates the concordance matrix.
@@ -88,6 +67,7 @@ void Electre::processConcordance()
         }
     }
 
+
     std::cout << "Concordance matrix: " << std::endl;
     for (std::vector<float> line : concordance)
     {
@@ -98,6 +78,7 @@ void Electre::processConcordance()
     std::cout << " ✅ Concordance done ✅ " << std::endl
               << std::endl;
 }
+
 
 /**
  * @brief Calculates the discordance matrix.
@@ -116,6 +97,7 @@ void Electre::processNondiscordance()
                 nonDiscordance[x][y] = false;
                 continue;
             }
+
 
             for (int criterium = 0; criterium < weights.size(); criterium++)
             {
@@ -142,6 +124,7 @@ void Electre::processNondiscordance()
     }
     std::cout << " ✅ Concordance done ✅ " << std::endl
             << std::endl;
+
 }
 
 /**
