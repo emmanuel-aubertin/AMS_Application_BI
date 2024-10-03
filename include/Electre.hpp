@@ -19,7 +19,6 @@ class Electre {
         void processNondiscordance();
     public:
         Electre(std::vector<std::vector<int>> values, std::vector<float> weights, std::vector<float> vetos, float concordanceThreshold);
-        Electre(std::vector<std::vector<int>> values, std::vector<float> weights, float concordanceThreshold);
         
         std::vector<int> getKernel();
 };

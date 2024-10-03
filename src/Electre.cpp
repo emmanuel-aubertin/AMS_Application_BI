@@ -20,7 +20,7 @@ void Electre::processMatrixes() {
 
 void Electre::processConcordance() {
     int size = concordance.size();
-    for (int y=0; y<size-1; y++)
+    for (int y=0; y<size-1; y++) {
         for (int x=y+1; x<size; x++) {
             int concordVal1 = 0; 
             int concordVal2 = 0;
@@ -50,11 +50,13 @@ void Electre::processConcordance() {
 }
 
 void Electre::processNondiscordance() {
-    int size = concordance.size();
+    int size = nonDiscordance.size();
     for (int y=0; y<size; y++) {
         for (int x=0; x<size; x++) {
-            if (x == y)
+            if (x == y) {
+                nonDiscordance[x][y] = false;
                 continue;
+            }
 
             for (int criterium=0; criterium<weights.size(); criterium++) {
                 int candidateVal1 = values[y][criterium]; 
