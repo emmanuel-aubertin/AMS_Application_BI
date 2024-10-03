@@ -24,7 +24,7 @@ clean:
 
 compiler: 
 	@printf "\e[32m--------| \e[1;32mCompilation of all your .cpp\e[0m\e[32m |--------\e[0m\n\n"
-	$(COMPILER) -std=c++23 src/main.cpp src/parser.cpp src/Electre.cpp -o out.bin
+	$(COMPILER) -std=c++23 src/main.cpp src/Parser.cpp src/Electre.cpp -o out.bin
 	@printf "\e[32m\tDONE\e[0m\n"
 
 
