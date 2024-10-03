@@ -12,7 +12,7 @@
 std::string PROGNAME = "TBA";
 std::string RELEASE = "Revision 0.1 | Last update 30 Sept 2024";
 std::string AUTHOR = "\033[1mAubertin Emmanuel, Ange Cure, Jerome Chen\033[0m";
-std::string COPYRIGHT = "(c) 2024 " + AUTHOR + " from https://github.com/SkyInSightTeam";
+std::string COPYRIGHT = "(c) 2024 " + AUTHOR + "\nFrom https://github.com/emmanuel-aubertin/AMS_Application_BI";
 bool VERBOSE = false;
 
 auto print_release = []
