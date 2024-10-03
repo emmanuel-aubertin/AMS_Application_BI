@@ -4,23 +4,25 @@
 #include <vector>
 #include <iostream>
 
-class Electre {
-    private:
-        std::vector<std::vector<int>> values;
-        std::vector<float> weights;
-        std::vector<float> vetos;
+class Electre
+{
+private:
+    std::vector<std::vector<float>> values;
+    std::vector<float> weights;
+    std::vector<float> vetos;
 
-        std::vector<std::vector<float>> concordance;
-        std::vector<std::vector<bool>> nonDiscordance;
-        std::vector<int> kernel;
-    
-        void processMatrixes();
-        void processConcordance();
-        void processNondiscordance();
-    public:
-        Electre(std::vector<std::vector<int>> values, std::vector<float> weights, std::vector<float> vetos, float concordanceThreshold);
-        
-        std::vector<int> getKernel();
+    std::vector<std::vector<float>> concordance;
+    std::vector<std::vector<bool>> nonDiscordance;
+    std::vector<float> kernel;
+
+    void processMatrixes();
+    void processConcordance();
+    void processNondiscordance();
+
+public:
+    Electre(std::vector<std::vector<float>> values, std::vector<float> weights, std::vector<float> vetos, float concordanceThreshold);
+
+    std::vector<float> getKernel();
 };
 
 #endif

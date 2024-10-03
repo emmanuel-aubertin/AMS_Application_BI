@@ -95,14 +95,16 @@ int main(int argc, char **argv)
         }
     }
 
-    std::vector<std::vector<int>> values {
-        std::vector<int> {4500, -7, -7, -8},
-        std::vector<int> {4000, -7, -3, -8},
-        std::vector<int> {4000, -5, -7, -8},
-        std::vector<int> {3500, -5, -7, -5},
-        std::vector<int> {3500, -5, -7, -8},
-        std::vector<int> {3500, -3, -3, -8},
-        std::vector<int> {2500, -3, -7, -5},
+
+    std::vector<std::vector<float>> values {
+        std::vector<float> {4500, -7, -7, -8},
+        std::vector<float> {4000, -7, -3, -8},
+        std::vector<float> {4000, -5, -7, -8},
+        std::vector<float> {3500, -5, -7, -5},
+        std::vector<float> {3500, -5, -7, -8},
+        std::vector<float> {3500, -3, -3, -8},
+        std::vector<float> {2500, -3, -7, -5},
+
     };
 
     std::vector<float> weights {
