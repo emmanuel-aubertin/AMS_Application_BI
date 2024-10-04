@@ -116,6 +116,8 @@ int main(int argc, char **argv)
 
     Electre el(values, weights, vetos, concordanceThreshold);
 
+    std::cout << std::endl << "#######################################" << std::endl << "## PROMETHEE "  << std::endl << std::endl;
+
     std::vector<std::vector<float>> data = {
         {15, 16, 13},
         {16, 8.0, 18},
@@ -129,12 +131,11 @@ int main(int argc, char **argv)
 
     promethee.calculatePreferenceMatrix();
     promethee.printPreferenceMatrix();
-    // Should show :
-    /*
-    Preference Matrix:
-    -1   0.4  0.7
-    0.6  -1   0.6
-    0.3  0.4  -1
-    */
+    
+    std::cout << std::endl << " ✅ Preference done ✅ " << std::endl << std::endl;
+
+    promethee.calculateFlows();
+    promethee.printFlows();
+
     return 0;
 }

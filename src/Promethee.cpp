@@ -88,3 +88,60 @@ void Promethee::printPreferenceMatrix()
         std::cout << std::endl;
     }
 }
+
+/**
+ * @brief Calculate the positive (φ+) and negative (φ−) outranking flows for each alternative.
+ * 
+ * Positive flow (φ+) represents how much an alternative outranks other alternatives.
+ * Negative flow (φ−) represents how much an alternative is outranked by others.
+ */
+void Promethee::calculateFlows()
+{
+    int n = multicriteriaPreferenceMatrix.size(); // Number of alternatives
+
+    // Resize the positive and negative flow vectors to store values for each alternative
+    positiveFlow.resize(n, 0.0);
+    negativeFlow.resize(n, 0.0);
+    flows.resize(n, 0.0);
+
+    // Calculate the positive and negative flows
+    for (int i = 0; i < n; ++i)
+    {
+        for (int j = 0; j < n; ++j)
+        {
+            if (i != j)
+            {
+                positiveFlow[i] += multicriteriaPreferenceMatrix[i][j]; // Sum of how much i outranks others
+                negativeFlow[i] += multicriteriaPreferenceMatrix[j][i]; // Sum of how much i is outranked by others
+            }
+        }
+        flows[i] = positiveFlow[i] - negativeFlow[i];
+    }
+}
+
+/**
+ * @brief Print the positive and negative outranking flows for each alternative.
+ * 
+ * The positive flow (φ+) indicates the strength of an alternative in outranking others.
+ * The negative flow (φ−) indicates the degree to which an alternative is outranked by others.
+ */
+void Promethee::printFlows()
+{
+    std::cout << "Positive Flow (φ+):\n";
+    for (int i = 0; i < positiveFlow.size(); ++i)
+    {
+        std::cout << "Alternative " << i + 1 << ": " << std::setw(6) << positiveFlow[i] << "\n";
+    }
+
+    std::cout << "\nNegative Flow (φ−):\n";
+    for (int i = 0; i < negativeFlow.size(); ++i)
+    {
+        std::cout << "Alternative " << i + 1 << ": " << std::setw(6) << negativeFlow[i] << "\n";
+    }
+
+    std::cout << "\nFlows (φ):\n";
+    for (int i = 0; i < flows.size(); ++i)
+    {
+        std::cout << "Alternative " << i + 1 << ": " << std::setw(6) << flows[i] << "\n";
+    }
+}
