@@ -2,6 +2,8 @@
 #define ELECTRE_VETO_METHODS
 
 #include <vector>
+#include <cmath>
+#include <iostream>
 
 class Electre {
     private:
@@ -13,7 +15,7 @@ class Electre {
 
         std::vector<std::vector<float>> concordance;
         std::vector<std::vector<bool>> nonDiscordance;
-        std::vector<int> kernel;
+        std::vector<bool> kernel;
     
         void processConcordance();
         void processNondiscordance();
@@ -36,7 +38,7 @@ class Electre {
         );
         
         void processMatrixes();
-        std::vector<int> getKernel();
+        std::vector<bool> getKernel();
 };
 
 #endif

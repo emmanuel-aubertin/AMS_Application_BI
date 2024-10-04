@@ -122,7 +122,7 @@ int main(int argc, char **argv)
     Electre elV(values, weights, vetos, concordanceThreshold);
     elV.processMatrixes();
 
-    Electre elS(values, weights, preferenceThresholds, vetos, concordanceThreshold);
+    Electre elS(values, weights, vetos, preferenceThresholds, concordanceThreshold);
     elS.processMatrixes();
 
     return 0;
