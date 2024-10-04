@@ -8,6 +8,7 @@
 #include <iostream>
 #include <string.h>
 #include "../include/Electre.hpp"
+#include "../include/Promethee.hpp"
 
 std::string PROGNAME = "TBA";
 std::string RELEASE = "Revision 0.1 | Last update 30 Sept 2024";
@@ -53,13 +54,12 @@ int main(int argc, char **argv)
     print_release();
     std::cout << std::endl
               << std::endl;
-  
+
     std::string filename = "";
     bool isFile = false;
 
     std::string filenameWeight = "";
     bool isWeightFile = false;
-
 
     // Arg parser
     if (argc < 0) // number of arg minimum
@@ -95,29 +95,46 @@ int main(int argc, char **argv)
         }
     }
 
-
-    std::vector<std::vector<float>> values {
-        std::vector<float> {4500, -7, -7, -8},
-        std::vector<float> {4000, -7, -3, -8},
-        std::vector<float> {4000, -5, -7, -8},
-        std::vector<float> {3500, -5, -7, -5},
-        std::vector<float> {3500, -5, -7, -8},
-        std::vector<float> {3500, -3, -3, -8},
-        std::vector<float> {2500, -3, -7, -5},
+    std::vector<std::vector<float>> values{
+        std::vector<float>{4500, -7, -7, -8},
+        std::vector<float>{4000, -7, -3, -8},
+        std::vector<float>{4000, -5, -7, -8},
+        std::vector<float>{3500, -5, -7, -5},
+        std::vector<float>{3500, -5, -7, -8},
+        std::vector<float>{3500, -3, -3, -8},
+        std::vector<float>{2500, -3, -7, -5},
 
     };
 
-    std::vector<float> weights {
-        5.0, 3.0, 1.0, 1.0
-    };
+    std::vector<float> weights{
+        5.0, 3.0, 1.0, 1.0};
 
-    std::vector<float> vetos {
-        750.0, 3.0, 3.5, 3.5
-    };
+    std::vector<float> vetos{
+        750.0, 3.0, 3.5, 3.5};
 
     float concordanceThreshold = 0.7;
 
     Electre el(values, weights, vetos, concordanceThreshold);
 
+    std::vector<std::vector<float>> data = {
+        {15, 16, 13},
+        {16, 8.0, 18},
+        {16, 7, 12}};
+
+        
+
+
+    std::vector<float> weightsProm = {0.6, 0.3, 0.1};
+    Promethee promethee(data, weightsProm);
+
+    promethee.calculatePreferenceMatrix();
+    promethee.printPreferenceMatrix();
+    // Should show :
+    /*
+    Preference Matrix:
+    -1   0.4  0.7
+    0.6  -1   0.6
+    0.3  0.4  -1
+    */
     return 0;
 }
