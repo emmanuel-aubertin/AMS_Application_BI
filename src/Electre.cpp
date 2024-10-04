@@ -10,7 +10,12 @@
  * @param vetos A vector of floating-point numbers representing the veto thresholds for each attribute.
  * @param concordanceThreshold A floating-point number representing the threshold for concordance.
  */
-Electre::Electre(std::vector<std::vector<float>> values, std::vector<float> weights, std::vector<float> vetos, float concordanceThreshold)
+Electre::Electre(
+    std::vector<std::vector<float>> values,
+    std::vector<float> weights,
+    std::vector<float> vetos,
+    float concordanceThreshold
+)
 {
     this->values = values;
     this->weights = weights;
@@ -22,6 +27,28 @@ Electre::Electre(std::vector<std::vector<float>> values, std::vector<float> weig
 
     // process values
     this->processMatrixes();
+}
+
+Electre::Electre(
+    std::vector<std::vector<float>> values, 
+    std::vector<float> weights, 
+    std::vector<float> vetos, 
+    std::vector<float> preferenceThresholds, 
+    float concordanceThreshold
+) : Electre::Electre(values, weights, vetos, concordanceThreshold) 
+{
+    this->preferenceThresholds = preferenceThresholds;
+}
+
+Electre::Electre(
+    std::vector<std::vector<float>> values, 
+    std::vector<float> weights, 
+    std::vector<float> vetos, 
+    std::vector<float> preferenceThresholds, 
+    float concordanceThreshold
+) : Electre::Electre(values, weights, vetos, concordanceThreshold) 
+{
+    this->preferenceThresholds = preferenceThresholds;
 }
 
 /**
@@ -66,27 +93,9 @@ void Electre::processConcordance()
             concordance[x][y] = concordVal2;
         }
     }
-
-
-    std::cout << "Concordance matrix: " << std::endl;
-    for (std::vector<float> line : concordance)
-    {
-        for (float val : line)
-            std::cout << val << "\t";
-        std::cout << std::endl;
-    }
-    std::cout << " ✅ Concordance done ✅ " << std::endl
-              << std::endl;
 }
-
-
-/**
- * @brief Calculates the discordance matrix.
- *
- * This method determines the degree to which attributes disagree on the relative preference of alternatives.
- */
-void Electre::processNondiscordance()
-{
+    
+void Electre::processNondiscordance() {
     int size = nonDiscordance.size();
     for (int y = 0; y < size; y++)
     {
@@ -114,25 +123,13 @@ void Electre::processNondiscordance()
             }
         }
     }
-
-    std::cout << "Non discordance matrix: " << std::endl;
-    for (std::vector<bool> line : nonDiscordance)
-    {
-        for (bool val : line)
-            std::cout << val << "\t";
-        std::cout << std::endl;
-    }
-    std::cout << " ✅ Concordance done ✅ " << std::endl
-            << std::endl;
-
 }
 
-/**
- * @brief Returns the kernel (final ranking) of alternatives.
- *
- * @return A vector of integers representing the ranking of alternatives.
- */
-std::vector<float> Electre::getKernel()
+void Electre::processKernel() 
 {
+    // TODO
+}
+
+std::vector<int> Electre::getKernel() {
     return kernel;
 }
