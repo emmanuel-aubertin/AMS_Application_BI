@@ -121,7 +121,9 @@ void Electre::processNondiscordance() {
                 double candidateVal2 = values[x][criterium];
                 float veto = vetos[criterium];
 
-                if (candidateVal1 - candidateVal2 > veto)
+                double diff = candidateVal1 - candidateVal2;
+
+                if (diff > veto)
                 {
                     nonDiscordance[y][x] = false;
                     break;
@@ -129,6 +131,12 @@ void Electre::processNondiscordance() {
             }
         }
     }
+
+    std::cout << "Vetos: " << std::endl;
+    for (float val : vetos)
+        std::cout << val << " ";
+    std::cout << std::endl;
+
 
     std::cout << "Non discordance: " << std::endl;
     for (std::vector<bool> line : nonDiscordance) {

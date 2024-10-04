@@ -114,7 +114,7 @@ int main(int argc, char **argv)
     };
 
     std::vector<float> vetos {
-        750.0, 3.0, 3.5, 3.5
+        45, 29, 550, 6 ,4.5, 4.5
     };
 
     float concordanceThreshold = 0.6;
