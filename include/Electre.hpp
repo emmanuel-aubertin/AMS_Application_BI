@@ -1,28 +1,44 @@
-#ifndef ELECTRE_METHODS
-#define ELECTRE_METHODS
+#ifndef ELECTRE_VETO_METHODS
+#define ELECTRE_VETO_METHODS
 
 #include <vector>
+#include <cmath>
 #include <iostream>
 
-class Electre
-{
-private:
-    std::vector<std::vector<float>> values;
-    std::vector<float> weights;
-    std::vector<float> vetos;
+class Electre {
+    private:
+        std::vector<std::vector<float>> values;
+        std::vector<float> weights;
+        std::vector<float> vetos;
+        std::vector<float> preferenceThresholds;
+        float concordanceThreshold;
 
-    std::vector<std::vector<float>> concordance;
-    std::vector<std::vector<bool>> nonDiscordance;
-    std::vector<float> kernel;
+        std::vector<std::vector<float>> concordance;
+        std::vector<std::vector<bool>> nonDiscordance;
+        std::vector<bool> kernel;
+    
+        void processConcordance();
+        void processNondiscordance();
+        void processKernel();
 
-    void processMatrixes();
-    void processConcordance();
-    void processNondiscordance();
+    public:
+        Electre(
+            std::vector<std::vector<float>> values, 
+            std::vector<float> weights, 
+            std::vector<float> vetos, 
+            float concordanceThreshold
+        );
 
-public:
-    Electre(std::vector<std::vector<float>> values, std::vector<float> weights, std::vector<float> vetos, float concordanceThreshold);
-
-    std::vector<float> getKernel();
+        Electre(
+            std::vector<std::vector<float>> values, 
+            std::vector<float> weights, 
+            std::vector<float> vetos, 
+            std::vector<float> preferenceThresholds, 
+            float concordanceThreshold
+        );
+        
+        void processMatrixes();
+        std::vector<bool> getKernel();
 };
 
 #endif

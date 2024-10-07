@@ -95,26 +95,35 @@ int main(int argc, char **argv)
         }
     }
 
-    std::vector<std::vector<float>> values{
-        std::vector<float>{4500, -7, -7, -8},
-        std::vector<float>{4000, -7, -3, -8},
-        std::vector<float>{4000, -5, -7, -8},
-        std::vector<float>{3500, -5, -7, -5},
-        std::vector<float>{3500, -5, -7, -8},
-        std::vector<float>{3500, -3, -3, -8},
-        std::vector<float>{2500, -3, -7, -5},
-
+    // ELECTRE
+    std::vector<std::vector<float>> values {
+        std::vector<float> {80, -90, 600,  5.4, 8, -5},
+        std::vector<float> {65, -58, 200,  9.7, 1, -1},
+        std::vector<float> {83, -60, 400,  7.2, 4, -7},
+        std::vector<float> {40, -80, 1000, 7.5, 7, -10},
+        std::vector<float> {52, -72, 600,  2.0, 3, -8},
+        std::vector<float> {94, -96, 700,  3.6, 5, -6},
     };
 
-    std::vector<float> weights{
-        5.0, 3.0, 1.0, 1.0};
+    std::vector<float> weights {
+        0.1, 0.2, 0.2, 0.1, 0.2, 0.2
+    };
 
-    std::vector<float> vetos{
-        750.0, 3.0, 3.5, 3.5};
+    std::vector<float> preferenceThresholds {
+        20, 10, 200, 4, 2, 2    
+    };
 
-    float concordanceThreshold = 0.7;
+    std::vector<float> vetos {
+        45, 29, 550, 6 ,4.5, 4.5
+    };
 
-    Electre el(values, weights, vetos, concordanceThreshold);
+    float concordanceThreshold = 0.6;
+
+    Electre elV(values, weights, vetos, concordanceThreshold);
+    elV.processMatrixes();
+
+    Electre elS(values, weights, vetos, preferenceThresholds, concordanceThreshold);
+    elS.processMatrixes();
 
     std::cout << std::endl << "#######################################" << std::endl << "## PROMETHEE "  << std::endl << std::endl;
 
