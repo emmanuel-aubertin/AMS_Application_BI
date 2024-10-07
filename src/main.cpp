@@ -8,6 +8,7 @@
 #include <iostream>
 #include <string.h>
 #include "../include/Electre.hpp"
+#include "../include/Promethee.hpp"
 
 std::string PROGNAME = "TBA";
 std::string RELEASE = "Revision 0.1 | Last update 30 Sept 2024";
@@ -53,13 +54,12 @@ int main(int argc, char **argv)
     print_release();
     std::cout << std::endl
               << std::endl;
-  
+
     std::string filename = "";
     bool isFile = false;
 
     std::string filenameWeight = "";
     bool isWeightFile = false;
-
 
     // Arg parser
     if (argc < 0) // number of arg minimum
@@ -124,6 +124,27 @@ int main(int argc, char **argv)
 
     Electre elS(values, weights, vetos, preferenceThresholds, concordanceThreshold);
     elS.processMatrixes();
+
+    std::cout << std::endl << "#######################################" << std::endl << "## PROMETHEE "  << std::endl << std::endl;
+
+    std::vector<std::vector<float>> data = {
+        {15, 16, 13},
+        {16, 8.0, 18},
+        {16, 7, 12}};
+
+        
+
+
+    std::vector<float> weightsProm = {0.6, 0.3, 0.1};
+    Promethee promethee(data, weightsProm);
+
+    promethee.calculatePreferenceMatrix();
+    promethee.printPreferenceMatrix();
+    
+    std::cout << std::endl << " ✅ Preference done ✅ " << std::endl << std::endl;
+
+    promethee.calculateFlows();
+    promethee.printFlows();
 
     return 0;
 }
