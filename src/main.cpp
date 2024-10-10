@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <string.h>
+#include "../include/Parser.hpp"
 #include "../include/Electre.hpp"
 #include "../include/Promethee.hpp"
 
@@ -95,56 +96,35 @@ int main(int argc, char **argv)
         }
     }
 
-    // ELECTRE
-    std::vector<std::vector<float>> values {
-        std::vector<float> {80, -90, 600,  5.4, 8, -5},
-        std::vector<float> {65, -58, 200,  9.7, 1, -1},
-        std::vector<float> {83, -60, 400,  7.2, 4, -7},
-        std::vector<float> {40, -80, 1000, 7.5, 7, -10},
-        std::vector<float> {52, -72, 600,  2.0, 3, -8},
-        std::vector<float> {94, -96, 700,  3.6, 5, -6},
-    };
+    Parser parser = Parser();
 
-    std::vector<float> weights {
-        0.1, 0.2, 0.2, 0.1, 0.2, 0.2
-    };
-
-    std::vector<float> preferenceThresholds {
-        20, 10, 200, 4, 2, 2    
-    };
-
-    std::vector<float> vetos {
-        45, 29, 550, 6 ,4.5, 4.5
-    };
-
-    float concordanceThreshold = 0.6;
-
-    Electre elV(values, weights, vetos, concordanceThreshold);
-    elV.processMatrixes();
-
-    Electre elS(values, weights, vetos, preferenceThresholds, concordanceThreshold);
-    elS.processMatrixes();
-
-    std::cout << std::endl << "#######################################" << std::endl << "## PROMETHEE "  << std::endl << std::endl;
-
-    std::vector<std::vector<float>> data = {
-        {15, 16, 13},
-        {16, 8.0, 18},
-        {16, 7, 12}};
-
-        
+    if (isFile)
+    {
+        parser.parseFile(filename);
+    }
+    if (isWeightFile)
+    {
+        parser.parseWeightFile(filenameWeight);
+    }
 
 
-    std::vector<float> weightsProm = {0.6, 0.3, 0.1};
+    std::vector<std::vector<float>> data = parser.getParsedFile();
+    std::vector<float> weightsProm = parser.getParsedWeight();
+
+    for(auto const &weight : weightsProm) {
+        std::cout << weight << ", " << std::endl;
+    }
+
     Promethee promethee(data, weightsProm);
-
     promethee.calculatePreferenceMatrix();
-    promethee.printPreferenceMatrix();
-    
-    std::cout << std::endl << " ✅ Preference done ✅ " << std::endl << std::endl;
+    //promethee.printPreferenceMatrix();
+
+    std::cout << std::endl
+              << " ✅ Preference done ✅ " << std::endl
+              << std::endl;
 
     promethee.calculateFlows();
-    promethee.printFlows();
+    promethee.printLatexOutput();
 
     return 0;
 }

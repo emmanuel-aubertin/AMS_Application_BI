@@ -30,7 +30,7 @@ compiler:
 
 test: compiler
 	$(PRINT) "\e[32m--------| \e[1mTest of the binary file\e[0m\e[32m |--------\e[0m\n\n"
-	./out.bin
+	./out.bin -d data/recycle/donnees.csv -w data/recycle/poids.csv
 	$(PRINT) "\e[32m\tDONE\e[0m\n"
 
 .PHONY: all clean test
