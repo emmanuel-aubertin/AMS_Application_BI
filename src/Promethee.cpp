@@ -28,7 +28,7 @@ Promethee::Promethee(std::vector<std::vector<float>> data, std::vector<float> we
  */
 float Promethee::calculatePreference(float value1, float value2)
 {
-    return (value1 > value2) ? 1.0 : 0.0;
+    return (value1 > value2) ? 0.0 : 1.0;
 }
 
 /**
@@ -51,7 +51,7 @@ void Promethee::calculatePreferenceMatrix()
         {
             if (i == j)
             {
-                multicriteriaPreferenceMatrix[i][j] = -1; // Diagonal element
+                multicriteriaPreferenceMatrix[i][j] = 1; // Diagonal element
             }
             else
             {
@@ -80,7 +80,7 @@ void Promethee::printPreferenceMatrix()
     {
         for (int j = 0; j < multicriteriaPreferenceMatrix[i].size(); ++j)
         {
-            if (multicriteriaPreferenceMatrix[i][j] == -1)
+            if (multicriteriaPreferenceMatrix[i][j] == 0)
                 std::cout << std::setw(4) << "-1" << "\t"; // Diagonal element
             else
                 std::cout << std::setw(4) << multicriteriaPreferenceMatrix[i][j] << "\t"; // Other elements
@@ -91,7 +91,7 @@ void Promethee::printPreferenceMatrix()
 
 /**
  * @brief Calculate the positive (φ+) and negative (φ−) outranking flows for each alternative.
- * 
+ *
  * Positive flow (φ+) represents how much an alternative outranks other alternatives.
  * Negative flow (φ−) represents how much an alternative is outranked by others.
  */
@@ -121,7 +121,7 @@ void Promethee::calculateFlows()
 
 /**
  * @brief Print the positive and negative outranking flows for each alternative.
- * 
+ *
  * The positive flow (φ+) indicates the strength of an alternative in outranking others.
  * The negative flow (φ−) indicates the degree to which an alternative is outranked by others.
  */
@@ -144,4 +144,24 @@ void Promethee::printFlows()
     {
         std::cout << "Alternative " << i + 1 << ": " << std::setw(6) << flows[i] << "\n";
     }
+}
+
+void Promethee::printLatexOutput()
+{
+    // TODO: add the preference matrix to latex output
+    std::cout << "\\begin{table}[h] \n";
+    std::cout << "\\centering \n";
+    std::cout << "\\begin{tabular}{|c|c|c|c|} \n";
+    std::cout << "\\hline \n";
+    std::cout << "\\textbf{Alternative} & \\textbf{Positive Flow (\\varphi+)} & \\textbf{Negative Flow (\\varphi−)} & \\textbf{Flows (\\varphi)} \\\\ \n";
+    std::cout << "\\hline \n";
+    for (int i = 0; i < flows.size(); ++i)
+    {
+        std::cout << "Alternative " << i + 1 << ": & " << positiveFlow[i] << " & " << negativeFlow[i] << " & " << flows[i] << " \\\\ \n";
+    }
+    std::cout << "\\hline \n";
+    std::cout << "\\end{tabular} \n";
+    std::cout << "\\caption{Promethee Flow Data} \n";
+    std::cout << "\\label{tab:promethee_flows} \n";
+    std::cout << "\\end{table} \n";
 }

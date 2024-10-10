@@ -11,7 +11,7 @@ private:
     std::vector<std::vector<float>> data;                          // Alternatives and criteria
     std::vector<float> weights;                                    // Weights for each criterion
     std::vector<std::vector<float>> multicriteriaPreferenceMatrix; // Multicriteria Preference Matrix
-    std::vector<float> flows;                               // Diff btw φ+ & φ-
+    std::vector<float> flows;                                      // Diff btw φ+ & φ-
     std::vector<float> positiveFlow;                               // Positive outranking flow (φ+)
     std::vector<float> negativeFlow;                               // Negative outranking flow (φ−)
 
@@ -24,6 +24,7 @@ public:
 
     void calculateFlows();
     void printFlows();
+    void printLatexOutput();
 };
 
 #endif
