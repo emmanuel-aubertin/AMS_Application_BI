@@ -16,10 +16,15 @@ class Electre {
         std::vector<std::vector<float>> concordance;
         std::vector<std::vector<bool>> nonDiscordance;
         std::vector<bool> kernel;
+        std::vector<std::vector<bool>> dominanceMatrix;
     
         void processConcordance();
         void processNondiscordance();
+        void processDominance();
         void processKernel();
+        std::vector<std::vector<int>> getCycles();
+        std::vector<std::vector<int>> getSuccessorCycles(int candidate, std::vector<int> visitedChilds);
+        bool hasSameElements(std::vector<int> vec1, std::vector<int> vec2);
 
     public:
         Electre(

@@ -20,6 +20,7 @@ Electre::Electre(
     this->values = values;
     this->weights = weights;
     this->vetos = vetos;
+    this->concordanceThreshold = concordanceThreshold;
     
     int nbCandidates = values.size();
     int nbVariables = weights.size();
@@ -28,6 +29,7 @@ Electre::Electre(
     concordance = std::vector<std::vector<float>>(nbCandidates, std::vector<float>(nbCandidates, 0.0));
     nonDiscordance = std::vector<std::vector<bool>>(nbCandidates, std::vector<bool>(nbCandidates, true));
     kernel = std::vector<bool>(nbCandidates, true);
+    dominanceMatrix = std::vector<std::vector<bool>>(nbCandidates, std::vector<bool>(nbCandidates, false));
 }
 
 Electre::Electre(
@@ -132,51 +134,140 @@ void Electre::processNondiscordance() {
         }
     }
 
-    std::cout << "Vetos: " << std::endl;
-    for (float val : vetos)
-        std::cout << val << " ";
-    std::cout << std::endl;
-
-
     std::cout << "Non discordance: " << std::endl;
     for (std::vector<bool> line : nonDiscordance) {
-        for (bool val : line)
+        for (bool val : line) 
             std::cout << val << "\t";
         std::cout << std::endl;
     }
 }
 
+void Electre::processDominance() 
+{
+    for (int y=0; y < values.size(); y++) {
+        for (int x=0; x < values.size(); x++) {
+            if (concordance[y][x] < concordanceThreshold)
+                continue;
+
+            if (!nonDiscordance[y][x])
+                continue;
+
+            dominanceMatrix[y][x] = true;
+        }
+    }
+} 
+
+
 void Electre::processKernel() 
 {
-    // check columns for > concordanceThreshold and nonDiscordance == true
     int size = concordance.size();
     for (int y=0; y<size; y++) {
         for (int x=0; x<size; x++) {
             if (!kernel[x])
                 continue;
-            
-            if (x == y) 
+
+            if (!dominanceMatrix[y][x])
                 continue;
 
-            if (concordanceThreshold > concordance[y][x]) {
-                kernel[x] = false;
-                continue;
+            std::cout << y << " domine " << x << std::endl;
+
+            kernel[x] = false;
+        }
+    }
+
+    // check for cycles
+    // if cycles found
+    // keep the strongest link
+
+    std::cout << "Kernel" << std::endl;
+    for (bool val : kernel)
+        std::cout << val << " ";
+    std::cout << std::endl;
+}
+
+std::vector<std::vector<int>> Electre::getCycles()
+{
+    std::vector<std::vector<int>> cycles;
+
+    for (int candidate=0; candidate < dominanceMatrix.size(); candidate++) {
+        std::vector<std::vector<int>> returnedVector = getSuccessorCycles(candidate, std::vector<int>());
+        
+        if (returnedVector.empty()) 
+            continue;
+        
+
+        if (cycles.empty())
+            cycles.push_back(returnedVector[0]);
+
+        // filtering the identical cycles, keep the longest ones
+        for (int retInd = 0; retInd < returnedVector.size(); retInd++) {
+            bool vectorInCycles = false;
+            std::vector<int> retVec = returnedVector[retInd];
+
+            for (int cycleInd = 0; cycleInd < cycles.size(); cycleInd++) {
+                std::vector<int> cycleVec = cycles[cycleInd];
+
+
+                // COMPARE TO ALL THE ELEMENTS 
+                if (hasSameElements(retVec, cycleVec)) {
+                    vectorInCycles = true;
+                    break;
+                }
             }
 
-            if (!nonDiscordance[y][x]) {
-                kernel[x] = false;
-                continue;
+            if (!vectorInCycles)
+                cycles.push_back(retVec);
+        }    
+    }
+
+    return cycles;
+}
+
+std::vector<std::vector<int>> Electre::getSuccessorCycles(int candidate, std::vector<int> visitedChilds) 
+{
+    for (int i=0; i<visitedChilds.size(); i++) {
+        if (candidate == visitedChilds[i])
+            // return the sliced vector containing the cycle
+            return std::vector<std::vector<int>> {std::vector(visitedChilds.begin()+i, visitedChilds.end())};;
+    }
+
+    visitedChilds.push_back(candidate);
+
+    std::vector<std::vector<int>> returnVector{};
+
+    for (int i=0; i<dominanceMatrix.size(); i++) {
+        if (dominanceMatrix[candidate][i] == 1) {
+            std::vector<std::vector<int>> cycleVector = getSuccessorCycles(i, visitedChilds);
+
+            // flattening into vector<vector<int>>
+            for (std::vector<int> vec : cycleVector) {
+                returnVector.push_back(vec);
+            }    
+        }
+    }
+
+    return returnVector;
+}
+
+bool Electre::hasSameElements(std::vector<int> vec1, std::vector<int> vec2) 
+{
+    if (vec1.size() != vec2.size())
+        return false;
+
+    std::vector<int> tempVec;
+    
+    for (int el1 : vec1) {
+        for (int el2 : vec2) {
+            if (el1 == el2) {
+                tempVec.push_back(el1);
+                break;         
             }
         }
     }
 
-    for (bool val : kernel)
-        std::cout << val << " ";
-    std::cout << std::endl;
-
-    // check for cycles
-
+    return (tempVec.size() == vec1.size());
 }
+
 
 std::vector<bool> Electre::getKernel() {
     return kernel;
