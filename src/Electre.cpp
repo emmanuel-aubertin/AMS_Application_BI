@@ -14,6 +14,7 @@ Electre::Electre(
     std::vector<std::vector<float>> values,
     std::vector<float> weights,
     std::vector<float> vetos,
+    std::vector<OptimizationType> optimizations,
     float concordanceThreshold
 )
 {
@@ -21,15 +22,16 @@ Electre::Electre(
     this->weights = weights;
     this->vetos = vetos;
     this->concordanceThreshold = concordanceThreshold;
+    this->optimizations = optimizations;
     
-    int nbCandidates = values.size();
-    int nbVariables = weights.size();
-    preferenceThresholds = std::vector<float>(nbVariables, 0.0);
+    nbCandidates = values.size();
+    nbCriteria = weights.size();
+    preferenceThresholds = std::vector<float>(nbCriteria, 0.0);
 
     concordance = std::vector<std::vector<float>>(nbCandidates, std::vector<float>(nbCandidates, 0.0));
     nonDiscordance = std::vector<std::vector<bool>>(nbCandidates, std::vector<bool>(nbCandidates, true));
     kernel = std::vector<bool>(nbCandidates, true);
-    dominanceMatrix = std::vector<std::vector<bool>>(nbCandidates, std::vector<bool>(nbCandidates, false));
+    dominance = std::vector<std::vector<bool>>(nbCandidates, std::vector<bool>(nbCandidates, false));
 }
 
 Electre::Electre(
@@ -37,8 +39,9 @@ Electre::Electre(
     std::vector<float> weights, 
     std::vector<float> vetos, 
     std::vector<float> preferenceThresholds, 
+    std::vector<OptimizationType> optimizations,
     float concordanceThreshold
-) : Electre::Electre(values, weights, vetos, concordanceThreshold) 
+) : Electre::Electre(values, weights, vetos, optimizations, concordanceThreshold) 
 {
     this->preferenceThresholds = preferenceThresholds;
 }
@@ -51,6 +54,7 @@ void Electre::processMatrixes()
 {
     processConcordance();
     processNondiscordance();
+    processDominance();
     processKernel();
 }
 
@@ -63,15 +67,14 @@ void Electre::processMatrixes()
  */
 void Electre::processConcordance()
 {
-    int size = concordance.size();
-    for (int y = 0; y < size - 1; y++)
+    for (int y = 0; y < nbCandidates - 1; y++)
     {
-        for (int x = y + 1; x < size; x++)
+        for (int x = y + 1; x < nbCandidates; x++)
         {
             float concordVal1 = 0;
             float concordVal2 = 0;
 
-            for (int criterium = 0; criterium < weights.size(); criterium++)
+            for (int criterium = 0; criterium < nbCriteria; criterium++)
             {
                 float candidateVal1 = values[y][criterium];
                 float candidateVal2 = values[x][criterium];
@@ -87,15 +90,28 @@ void Electre::processConcordance()
                     continue;
                 }
 
-                // TODO: replace < with > if MAXIMISE
-                if (candidateVal1 < candidateVal2) {
-                    concordVal1 += val;
-                    concordVal2 += coeff * val;
-                    continue;
-                }
+                if (optimizations[criterium] == MIN) 
+                {
+                    if (candidateVal1 < candidateVal2) {
+                        concordVal1 += val;
+                        concordVal2 += coeff * val;
+                        continue;
+                    }
 
-                concordVal2 += val;
-                concordVal1 += coeff * val;
+                    concordVal2 += val;
+                    concordVal1 += coeff * val;
+                }
+                else 
+                {
+                    if (candidateVal1 > candidateVal2) {
+                        concordVal1 += val;
+                        concordVal2 += coeff * val;
+                        continue;
+                    }
+
+                    concordVal2 += val;
+                    concordVal1 += coeff * val;
+                }
             }
 
             concordance[y][x] = concordVal1;
@@ -104,118 +120,111 @@ void Electre::processConcordance()
     }
 }
     
-void Electre::processNondiscordance() {
-    int size = nonDiscordance.size();
-    for (int y = 0; y < size; y++)
+void Electre::processNondiscordance() 
+{
+    for (int criterium = 0; criterium < nbCriteria; criterium++) 
     {
-        for (int x = 0; x < size; x++)
+        for (int y = 0; y < nbCandidates; y++)
         {
-            if (x == y)
+            for (int x = 0; x < nbCandidates; x++) 
             {
-                nonDiscordance[x][y] = false;
-                continue;
-            }
+                if (y == x)
+                {
+                    nonDiscordance[y][x] = false;
+                    continue;
+                }
 
+                if (!nonDiscordance[y][x])
+                    continue;
 
-            for (int criterium = 0; criterium < weights.size(); criterium++)
-            {
                 double candidateVal1 = values[y][criterium];
                 double candidateVal2 = values[x][criterium];
                 float veto = vetos[criterium];
 
+                if (optimizations[criterium] == MAX) {
+                    candidateVal1 = -candidateVal1; 
+                    candidateVal2 = -candidateVal2; 
+                }
+
                 double diff = candidateVal1 - candidateVal2;
 
-                if (diff > veto)
-                {
+                if (diff > veto) {
                     nonDiscordance[y][x] = false;
-                    break;
+                    continue;
                 }
             }
         }
-    }
-
-    std::cout << "Non discordance: " << std::endl;
-    for (std::vector<bool> line : nonDiscordance) {
-        for (bool val : line) 
-            std::cout << val << "\t";
-        std::cout << std::endl;
     }
 }
 
 void Electre::processDominance() 
 {
-    for (int y=0; y < values.size(); y++) {
-        for (int x=0; x < values.size(); x++) {
+    for (int y = 0; y < nbCandidates; y++) {
+        for (int x = 0; x < nbCandidates; x++) {
             if (concordance[y][x] < concordanceThreshold)
                 continue;
 
             if (!nonDiscordance[y][x])
                 continue;
 
-            dominanceMatrix[y][x] = true;
+            dominance[y][x] = true;
         }
     }
 } 
 
-
 void Electre::processKernel() 
 {
-    int size = concordance.size();
-    for (int y=0; y<size; y++) {
-        for (int x=0; x<size; x++) {
-            if (!kernel[x])
-                continue;
+    std::vector<std::vector<int>> cycles = getCycles();
+    if (cycles.size() != 0)
+        deleteCycles(cycles);
 
-            if (!dominanceMatrix[y][x])
-                continue;
+    // get kernel
+    for (int y = 0; y < nbCandidates; y++) {
+        for (int x = 0; x < nbCandidates; x++) {
+            // if (!kernel[x])
+            //     continue;
 
-            std::cout << y << " domine " << x << std::endl;
+            if (!dominance[y][x])
+                continue;
 
             kernel[x] = false;
         }
     }
 
-    // check for cycles
-    // if cycles found
-    // keep the strongest link
-
     std::cout << "Kernel" << std::endl;
     for (bool val : kernel)
         std::cout << val << " ";
     std::cout << std::endl;
+
+
 }
 
 std::vector<std::vector<int>> Electre::getCycles()
 {
     std::vector<std::vector<int>> cycles;
 
-    for (int candidate=0; candidate < dominanceMatrix.size(); candidate++) {
+    for (int candidate = 0; candidate < nbCandidates; candidate++) {
         std::vector<std::vector<int>> returnedVector = getSuccessorCycles(candidate, std::vector<int>());
         
         if (returnedVector.empty()) 
             continue;
-        
 
-        if (cycles.empty())
-            cycles.push_back(returnedVector[0]);
-
-        // filtering the identical cycles, keep the longest ones
+        // filtering the identical cycles; keeping only unique ones
         for (int retInd = 0; retInd < returnedVector.size(); retInd++) {
-            bool vectorInCycles = false;
+            bool cyclePresent = false;
             std::vector<int> retVec = returnedVector[retInd];
 
             for (int cycleInd = 0; cycleInd < cycles.size(); cycleInd++) {
                 std::vector<int> cycleVec = cycles[cycleInd];
 
-
-                // COMPARE TO ALL THE ELEMENTS 
+                // compare the selected cycle to the others that are getting returned
                 if (hasSameElements(retVec, cycleVec)) {
-                    vectorInCycles = true;
+                    cyclePresent = true;
                     break;
                 }
             }
 
-            if (!vectorInCycles)
+            if (!cyclePresent)
                 cycles.push_back(retVec);
         }    
     }
@@ -225,7 +234,7 @@ std::vector<std::vector<int>> Electre::getCycles()
 
 std::vector<std::vector<int>> Electre::getSuccessorCycles(int candidate, std::vector<int> visitedChilds) 
 {
-    for (int i=0; i<visitedChilds.size(); i++) {
+    for (int i = 0; i < visitedChilds.size(); i++) {
         if (candidate == visitedChilds[i])
             // return the sliced vector containing the cycle
             return std::vector<std::vector<int>> {std::vector(visitedChilds.begin()+i, visitedChilds.end())};;
@@ -235,8 +244,8 @@ std::vector<std::vector<int>> Electre::getSuccessorCycles(int candidate, std::ve
 
     std::vector<std::vector<int>> returnVector{};
 
-    for (int i=0; i<dominanceMatrix.size(); i++) {
-        if (dominanceMatrix[candidate][i] == 1) {
+    for (int i = 0; i < nbCandidates; i++) {
+        if (dominance[candidate][i] == 1) {
             std::vector<std::vector<int>> cycleVector = getSuccessorCycles(i, visitedChilds);
 
             // flattening into vector<vector<int>>
@@ -268,7 +277,49 @@ bool Electre::hasSameElements(std::vector<int> vec1, std::vector<int> vec2)
     return (tempVec.size() == vec1.size());
 }
 
+void Electre::deleteCycles(std::vector<std::vector<int>> cycles)
+{
+    for (std::vector<int> cycle : cycles) {
+        std::vector<std::array<int, 2>> links;
 
-std::vector<bool> Electre::getKernel() {
+        // init links
+        for (int linkIndex = 0; linkIndex < cycle.size(); linkIndex++) 
+        {
+            int start = cycle[linkIndex];
+            int end = (linkIndex+1 < cycle.size()) ? cycle[linkIndex+1] : cycle[0];
+            std::array<int, 2> link{start, end};
+            links.push_back(link);
+        }
+
+        // find the highest concordance values, and the link index
+        int highestConcordanceLinkIndex = 0;
+        float highestConcordanceValue = 0.0;
+        for (int i = 0; i < links.size(); i++) 
+        {
+            std::array<int, 2> link = links[i];
+            float concorValue = concordance[link[0]][link[1]];
+            if (concorValue > highestConcordanceValue)
+            {
+                highestConcordanceValue = concorValue;
+                highestConcordanceLinkIndex = i;
+            }
+        }
+
+        // delete the links
+        for (int i = 0; i < links.size(); i++) 
+        {
+            if (i == highestConcordanceLinkIndex)
+                continue;
+
+            std::array<int, 2> link = links[i];
+            dominance[link[0]][link[1]] = 0;
+        }
+    }
+
+}
+
+
+std::vector<bool> Electre::getKernel() 
+{
     return kernel;
 }

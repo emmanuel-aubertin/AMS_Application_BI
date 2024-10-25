@@ -2,8 +2,10 @@
 #define ELECTRE_VETO_METHODS
 
 #include <vector>
+#include <array>
 #include <cmath>
 #include <iostream>
+#include "OptimizationType.hpp"
 
 class Electre {
     private:
@@ -11,12 +13,16 @@ class Electre {
         std::vector<float> weights;
         std::vector<float> vetos;
         std::vector<float> preferenceThresholds;
+        std::vector<OptimizationType> optimizations;
         float concordanceThreshold;
+
+        int nbCandidates;
+        int nbCriteria;
 
         std::vector<std::vector<float>> concordance;
         std::vector<std::vector<bool>> nonDiscordance;
         std::vector<bool> kernel;
-        std::vector<std::vector<bool>> dominanceMatrix;
+        std::vector<std::vector<bool>> dominance;
     
         void processConcordance();
         void processNondiscordance();
@@ -25,12 +31,14 @@ class Electre {
         std::vector<std::vector<int>> getCycles();
         std::vector<std::vector<int>> getSuccessorCycles(int candidate, std::vector<int> visitedChilds);
         bool hasSameElements(std::vector<int> vec1, std::vector<int> vec2);
+        void deleteCycles(std::vector<std::vector<int>> cycles);
 
     public:
         Electre(
             std::vector<std::vector<float>> values, 
             std::vector<float> weights, 
             std::vector<float> vetos, 
+            std::vector<OptimizationType> optimizations,
             float concordanceThreshold
         );
 
@@ -39,6 +47,7 @@ class Electre {
             std::vector<float> weights, 
             std::vector<float> vetos, 
             std::vector<float> preferenceThresholds, 
+            std::vector<OptimizationType> optimizations,
             float concordanceThreshold
         );
         
