@@ -24,13 +24,13 @@ clean:
 
 compiler: 
 	@printf "\e[32m--------| \e[1;32mCompilation of all your .cpp\e[0m\e[32m |--------\e[0m\n\n"
-	$(COMPILER) -std=c++23 src/main.cpp src/Parser.cpp src/Electre.cpp -o out.bin
+	$(COMPILER) -std=c++23 src/*.cpp -o out.bin
 	@printf "\e[32m\tDONE\e[0m\n"
 
 
 test: compiler
 	$(PRINT) "\e[32m--------| \e[1mTest of the binary file\e[0m\e[32m |--------\e[0m\n\n"
-	./out.bin
+	./out.bin -d data/recycle/donnees.csv -w data/recycle/poids.csv
 	$(PRINT) "\e[32m\tDONE\e[0m\n"
 
 .PHONY: all clean test

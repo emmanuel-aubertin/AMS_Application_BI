@@ -1,0 +1,104 @@
+{
+    "label": [
+        "Catégories",
+        "Thèmes",
+        "Critères"
+    ],
+    "Acceptabilité technique": {
+        "Géologie": [
+            "Nature du substratum",
+            "Nature des terrains",
+            "Fissures - Fractures"
+        ],
+        "Hydrogéologie": [
+            "Aquifère supérieur",
+            "Aquifère souterrain",
+            "Eau potable"
+        ],
+        "Eaux superficielles": [
+            "Sensibilité milieu aval",
+            "Gestion des eaux",
+            "Bassin versant"
+        ],
+        "Accès": [
+            "Qualité desserte",
+            "Conditions d’accès",
+            "Entrée du site",
+            "Viabilité hivernale",
+            "Transport ferroviaire"
+        ],
+        "Distance et trafic": [
+            "Distance et durée",
+            "Flux PL"
+        ],
+        "Morphologie": [
+            "Pente",
+            "Exposition vents",
+            "Capacité potentielle"
+        ],
+        "Foncier": [
+            "Nombre propriétaires",
+            "Nombre Indivision"
+        ]
+    },
+    "Environnement naturel": {
+        "Paysage": [
+            "Contexte paysager",
+            "Règlements, classement",
+            "Sensibilité paysagère",
+            "Perception",
+            "Capacité d’intégration"
+        ],
+        "Milieux naturels": [
+            "Milieux naturels",
+            "Habitats naturels",
+            "Dynamique écologique"
+        ]
+    },
+    "Environnement socio-économique": {
+        "Agriculture": [
+            "Zones AOC",
+            "Autres labels",
+            "Aménagements pérennes",
+            "Usages agricoles",
+            "Structure foncière",
+            "Niveau d’impact"
+        ],
+        "Habitat": [
+            "Situation habitations",
+            "Nombre habitations"
+        ],
+        "Urbanisme": [
+            "Compatibilité POS/PLU",
+            "Evolution démographique",
+            "Servitudes"
+        ],
+        "Tourisme": [
+            "Sites réglementés",
+            "Patrimoine",
+            "Accueil",
+            "Loisirs"
+        ],
+        "Industrie Commerce Artisanat": [
+            "Environnement",
+            "Impact"
+        ]
+    },
+    "Economie": {
+        "Aménagement accès": [
+            "Réseau routier"
+        ],
+        "Achat terrain": [
+            "Valeur foncière"
+        ],
+        "Investissements projet": [
+            "Coût aménagements",
+            "Insertion paysagère",
+            "Modification réseaux",
+            "Raccordement"
+        ],
+        "Coût transport": [
+            "Coût transport"
+        ]
+    }
+}
