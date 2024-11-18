@@ -15,15 +15,14 @@ Electre::Electre(
     std::vector<float> weights,
     std::vector<float> vetos,
     std::vector<OptimizationType> optimizations,
-    float concordanceThreshold
-)
+    float concordanceThreshold)
 {
     this->values = values;
     this->weights = weights;
     this->vetos = vetos;
     this->concordanceThreshold = concordanceThreshold;
     this->optimizations = optimizations;
-    
+
     nbCandidates = values.size();
     nbCriteria = weights.size();
     preferenceThresholds = std::vector<float>(nbCriteria, 0.0);
@@ -35,17 +34,15 @@ Electre::Electre(
 }
 
 Electre::Electre(
-    std::vector<std::vector<float>> values, 
-    std::vector<float> weights, 
-    std::vector<float> vetos, 
-    std::vector<float> preferenceThresholds, 
+    std::vector<std::vector<float>> values,
+    std::vector<float> weights,
+    std::vector<float> vetos,
+    std::vector<float> preferenceThresholds,
     std::vector<OptimizationType> optimizations,
-    float concordanceThreshold
-) : Electre::Electre(values, weights, vetos, optimizations, concordanceThreshold) 
+    float concordanceThreshold) : Electre::Electre(values, weights, vetos, optimizations, concordanceThreshold)
 {
     this->preferenceThresholds = preferenceThresholds;
 }
-
 
 /**
  * @brief Processes the data to calculate the concordance and discordance matrices.
@@ -57,7 +54,6 @@ void Electre::processMatrixes()
     processDominance();
     processKernel();
 }
-
 
 /**
  * @brief Calculates the concordance matrix.
@@ -82,17 +78,19 @@ void Electre::processConcordance()
                 float val = weights[criterium];
 
                 double diff = std::abs(candidateVal1 - candidateVal2);
-                double coeff = 1 - std::min(1.0, diff/threshold);
+                double coeff = 1 - std::min(1.0, diff / threshold);
 
-                if (candidateVal1 == candidateVal2) {
+                if (candidateVal1 == candidateVal2)
+                {
                     concordVal1 += val;
                     concordVal2 += val;
                     continue;
                 }
 
-                if (optimizations[criterium] == MIN) 
+                if (optimizations[criterium] == MIN)
                 {
-                    if (candidateVal1 < candidateVal2) {
+                    if (candidateVal1 < candidateVal2)
+                    {
                         concordVal1 += val;
                         concordVal2 += coeff * val;
                         continue;
@@ -101,9 +99,10 @@ void Electre::processConcordance()
                     concordVal2 += val;
                     concordVal1 += coeff * val;
                 }
-                else 
+                else
                 {
-                    if (candidateVal1 > candidateVal2) {
+                    if (candidateVal1 > candidateVal2)
+                    {
                         concordVal1 += val;
                         concordVal2 += coeff * val;
                         continue;
@@ -119,14 +118,14 @@ void Electre::processConcordance()
         }
     }
 }
-    
-void Electre::processNondiscordance() 
+
+void Electre::processNondiscordance()
 {
-    for (int criterium = 0; criterium < nbCriteria; criterium++) 
+    for (int criterium = 0; criterium < nbCriteria; criterium++)
     {
         for (int y = 0; y < nbCandidates; y++)
         {
-            for (int x = 0; x < nbCandidates; x++) 
+            for (int x = 0; x < nbCandidates; x++)
             {
                 if (y == x)
                 {
@@ -141,14 +140,16 @@ void Electre::processNondiscordance()
                 double candidateVal2 = values[x][criterium];
                 float veto = vetos[criterium];
 
-                if (optimizations[criterium] == MAX) {
-                    candidateVal1 = -candidateVal1; 
-                    candidateVal2 = -candidateVal2; 
+                if (optimizations[criterium] == MAX)
+                {
+                    candidateVal1 = -candidateVal1;
+                    candidateVal2 = -candidateVal2;
                 }
 
                 double diff = candidateVal1 - candidateVal2;
 
-                if (diff > veto) {
+                if (diff > veto)
+                {
                     nonDiscordance[y][x] = false;
                     continue;
                 }
@@ -157,10 +158,12 @@ void Electre::processNondiscordance()
     }
 }
 
-void Electre::processDominance() 
+void Electre::processDominance()
 {
-    for (int y = 0; y < nbCandidates; y++) {
-        for (int x = 0; x < nbCandidates; x++) {
+    for (int y = 0; y < nbCandidates; y++)
+    {
+        for (int x = 0; x < nbCandidates; x++)
+        {
             if (concordance[y][x] < concordanceThreshold)
                 continue;
 
@@ -170,17 +173,19 @@ void Electre::processDominance()
             dominance[y][x] = true;
         }
     }
-} 
+}
 
-void Electre::processKernel() 
+void Electre::processKernel()
 {
     std::vector<std::vector<int>> cycles = getCycles();
     if (cycles.size() != 0)
         deleteCycles(cycles);
 
     // get kernel
-    for (int y = 0; y < nbCandidates; y++) {
-        for (int x = 0; x < nbCandidates; x++) {
+    for (int y = 0; y < nbCandidates; y++)
+    {
+        for (int x = 0; x < nbCandidates; x++)
+        {
             // if (!kernel[x])
             //     continue;
 
@@ -195,30 +200,32 @@ void Electre::processKernel()
     for (bool val : kernel)
         std::cout << val << " ";
     std::cout << std::endl;
-
-
 }
 
 std::vector<std::vector<int>> Electre::getCycles()
 {
     std::vector<std::vector<int>> cycles;
 
-    for (int candidate = 0; candidate < nbCandidates; candidate++) {
+    for (int candidate = 0; candidate < nbCandidates; candidate++)
+    {
         std::vector<std::vector<int>> returnedVector = getSuccessorCycles(candidate, std::vector<int>());
-        
-        if (returnedVector.empty()) 
+
+        if (returnedVector.empty())
             continue;
 
         // filtering the identical cycles; keeping only unique ones
-        for (int retInd = 0; retInd < returnedVector.size(); retInd++) {
+        for (int retInd = 0; retInd < returnedVector.size(); retInd++)
+        {
             bool cyclePresent = false;
             std::vector<int> retVec = returnedVector[retInd];
 
-            for (int cycleInd = 0; cycleInd < cycles.size(); cycleInd++) {
+            for (int cycleInd = 0; cycleInd < cycles.size(); cycleInd++)
+            {
                 std::vector<int> cycleVec = cycles[cycleInd];
 
                 // compare the selected cycle to the others that are getting returned
-                if (hasSameElements(retVec, cycleVec)) {
+                if (hasSameElements(retVec, cycleVec))
+                {
                     cyclePresent = true;
                     break;
                 }
@@ -226,50 +233,58 @@ std::vector<std::vector<int>> Electre::getCycles()
 
             if (!cyclePresent)
                 cycles.push_back(retVec);
-        }    
+        }
     }
 
     return cycles;
 }
 
-std::vector<std::vector<int>> Electre::getSuccessorCycles(int candidate, std::vector<int> visitedChilds) 
+std::vector<std::vector<int>> Electre::getSuccessorCycles(int candidate, std::vector<int> visitedChilds)
 {
-    for (int i = 0; i < visitedChilds.size(); i++) {
+    for (int i = 0; i < visitedChilds.size(); i++)
+    {
         if (candidate == visitedChilds[i])
             // return the sliced vector containing the cycle
-            return std::vector<std::vector<int>> {std::vector(visitedChilds.begin()+i, visitedChilds.end())};;
+            return std::vector<std::vector<int>>{std::vector(visitedChilds.begin() + i, visitedChilds.end())};
+        ;
     }
 
     visitedChilds.push_back(candidate);
 
     std::vector<std::vector<int>> returnVector{};
 
-    for (int i = 0; i < nbCandidates; i++) {
-        if (dominance[candidate][i] == 1) {
+    for (int i = 0; i < nbCandidates; i++)
+    {
+        if (dominance[candidate][i] == 1)
+        {
             std::vector<std::vector<int>> cycleVector = getSuccessorCycles(i, visitedChilds);
 
             // flattening into vector<vector<int>>
-            for (std::vector<int> vec : cycleVector) {
+            for (std::vector<int> vec : cycleVector)
+            {
                 returnVector.push_back(vec);
-            }    
+            }
         }
     }
 
     return returnVector;
 }
 
-bool Electre::hasSameElements(std::vector<int> vec1, std::vector<int> vec2) 
+bool Electre::hasSameElements(std::vector<int> vec1, std::vector<int> vec2)
 {
     if (vec1.size() != vec2.size())
         return false;
 
     std::vector<int> tempVec;
-    
-    for (int el1 : vec1) {
-        for (int el2 : vec2) {
-            if (el1 == el2) {
+
+    for (int el1 : vec1)
+    {
+        for (int el2 : vec2)
+        {
+            if (el1 == el2)
+            {
                 tempVec.push_back(el1);
-                break;         
+                break;
             }
         }
     }
@@ -279,14 +294,15 @@ bool Electre::hasSameElements(std::vector<int> vec1, std::vector<int> vec2)
 
 void Electre::deleteCycles(std::vector<std::vector<int>> cycles)
 {
-    for (std::vector<int> cycle : cycles) {
+    for (std::vector<int> cycle : cycles)
+    {
         std::vector<std::array<int, 2>> links;
 
         // init links
-        for (int linkIndex = 0; linkIndex < cycle.size(); linkIndex++) 
+        for (int linkIndex = 0; linkIndex < cycle.size(); linkIndex++)
         {
             int start = cycle[linkIndex];
-            int end = (linkIndex+1 < cycle.size()) ? cycle[linkIndex+1] : cycle[0];
+            int end = (linkIndex + 1 < cycle.size()) ? cycle[linkIndex + 1] : cycle[0];
             std::array<int, 2> link{start, end};
             links.push_back(link);
         }
@@ -294,7 +310,7 @@ void Electre::deleteCycles(std::vector<std::vector<int>> cycles)
         // find the highest concordance values, and the link index
         int highestConcordanceLinkIndex = 0;
         float highestConcordanceValue = 0.0;
-        for (int i = 0; i < links.size(); i++) 
+        for (int i = 0; i < links.size(); i++)
         {
             std::array<int, 2> link = links[i];
             float concorValue = concordance[link[0]][link[1]];
@@ -306,7 +322,7 @@ void Electre::deleteCycles(std::vector<std::vector<int>> cycles)
         }
 
         // delete the links
-        for (int i = 0; i < links.size(); i++) 
+        for (int i = 0; i < links.size(); i++)
         {
             if (i == highestConcordanceLinkIndex)
                 continue;
@@ -315,11 +331,9 @@ void Electre::deleteCycles(std::vector<std::vector<int>> cycles)
             dominance[link[0]][link[1]] = 0;
         }
     }
-
 }
 
-
-std::vector<bool> Electre::getKernel() 
+std::vector<bool> Electre::getKernel()
 {
     return kernel;
 }

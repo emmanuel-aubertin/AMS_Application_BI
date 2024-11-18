@@ -6,16 +6,28 @@
 #define BLUE "\033[34m"
 
 #include <iostream>
+#include <algorithm>
 #include <string.h>
 #include "../include/Parser.hpp"
 #include "../include/Electre.hpp"
 #include "../include/Promethee.hpp"
 
-std::string PROGNAME = "TBA";
+std::string PROGNAME = "ams-BI";
 std::string RELEASE = "Revision 0.1 | Last update 30 Sept 2024";
 std::string AUTHOR = "\033[1mAubertin Emmanuel, Ange Cure, Jerome Chen\033[0m";
 std::string COPYRIGHT = "(c) 2024 " + AUTHOR + "\nFrom https://github.com/emmanuel-aubertin/AMS_Application_BI";
 bool VERBOSE = false;
+
+struct Algo
+{
+    std::string name;
+    std::string argName;
+    std::string description;
+    std::string altInfo;
+
+    explicit Algo(const std::string &name, const std::string &argName, const std::string &description, const std::string &altInfo)
+        : name(name), argName(argName), description(description), altInfo(altInfo) {}
+};
 
 auto print_release = []
 {
@@ -28,25 +40,28 @@ auto failure = [](std::string_view message)
     std::cerr << "❌ Error: " << message << " ❌\n";
 };
 
-void print_usage()
+auto warning = [](std::string_view message)
+{
+    std::cerr << "⚠️ Warning: " << message << " ⚠️\n";
+};
+
+void print_usage(std::vector<Algo> &algo)
 {
     std::cout << std::endl
               << PROGNAME << " by " << AUTHOR << std::endl
-              << "\033[1mUsage: \033[0m" << PROGNAME << " | [-h | --help] | [-v | --version] " << std::endl
+              << "\033[1mUsage: \033[0m" << PROGNAME << " & [-d | --data] | [-h | --help] | [-v | --version] " << std::endl
               << "          -h | --help                     Help" << std::endl
               << "          -v | --version                  Version" << std::endl
-              << "          -d | --data                     Path to data CSV file" << std::endl
-              << "          -w | --weight                   Path to weight CSV file" << std::endl;
-};
-
-auto print_help = []()
-{
-    print_release();
-    std::cout << std::endl;
-    print_usage();
-    std::cout << std::endl
-              << std::endl;
-    exit(0);
+              << "          -a | --algo                     Choose the algorithm that you want to run : " << std::endl;
+    for (Algo a : algo)
+    {
+        std::cout << "                                              " << a.argName << "       " << a.description << " (" << a.altInfo << ")" << std::endl;
+    }
+    std::cout << "          -d | --data                     Path to data CSV file" << std::endl
+              << "          -w | --weight                   Path to weight CSV file" << std::endl
+              << std::endl
+              << "\033[1mExample to run Electre:\033[0m " << std::endl
+              << PROGNAME << " -a e -d data.csv -w weights.csv" << std::endl;
 };
 
 int main(int argc, char **argv)
@@ -56,11 +71,18 @@ int main(int argc, char **argv)
     std::cout << std::endl
               << std::endl;
 
+    std::vector<Algo> availableAlgos = {
+        Algo("Promethee", "p", "For Promethee algo", "in development"),
+        Algo("Electre", "e", "For Electre algo", "in development"),
+        Algo("All", "a", "For all algo", "by default")};
+
     std::string filename = "";
     bool isFile = false;
 
     std::string filenameWeight = "";
     bool isWeightFile = false;
+
+    std::string algoToRun = "a";
 
     // Arg parser
     if (argc < 0) // number of arg minimum
@@ -70,7 +92,7 @@ int main(int argc, char **argv)
     {
         if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help"))
         {
-            print_usage();
+            print_usage(availableAlgos);
             exit(0);
         }
         else if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--version"))
@@ -88,43 +110,75 @@ int main(int argc, char **argv)
             filenameWeight = argv[++i];
             isWeightFile = true;
         }
+        else if (!strcmp(argv[i], "-a") || !strcmp(argv[i], "--algo"))
+        {
+            if (++i < argc)
+            {
+                algoToRun = argv[i];
+
+                algoToRun.erase(std::remove_if(algoToRun.begin(), algoToRun.end(),
+                                               [&availableAlgos](char c)
+                                               {
+                                                   bool isValid = std::any_of(availableAlgos.begin(), availableAlgos.end(),
+                                                                              [c](const Algo &a)
+                                                                              { return a.argName == std::string(1, c); });
+
+                                                   if (!isValid)
+                                                   {
+                                                       warning(std::string(1, c) + " is not a valid algorithm");
+                                                   }
+                                                   return !isValid;
+                                               }),
+                                algoToRun.end());
+
+                if (algoToRun.empty())
+                {
+                    failure("No valid algorithm choices provided.");
+                    exit(1);
+                }
+            }
+            else
+            {
+                warning("Missing algorithm name after -a or --algo argument.");
+                std::cout << "Running all algorithm: " << std::endl;
+                algoToRun = "a";
+            }
+        }
+
         else
         { // ALL OTHER ARGUMENT
-            print_usage();
+            print_usage(availableAlgos);
             std::string arg = argv[i];
             failure("Unknow argument : " + arg);
         }
     }
 
     // Test Electre
-    std::vector<std::vector<float>> values {
-        std::vector<float> {4500, 7, 7, 8},
-        std::vector<float> {4000, 7, 3, 8},
-        std::vector<float> {4000, 5, 7, 8},
-        std::vector<float> {3500, 5, 7, 5},
-        std::vector<float> {3500, 5, 7, 8},
-        std::vector<float> {3500, 3, 3, 8},
-        std::vector<float> {2500, 3, 7, 5},
+    std::vector<std::vector<float>> values{
+        std::vector<float>{4500, 7, 7, 8},
+        std::vector<float>{4000, 7, 3, 8},
+        std::vector<float>{4000, 5, 7, 8},
+        std::vector<float>{3500, 5, 7, 5},
+        std::vector<float>{3500, 5, 7, 8},
+        std::vector<float>{3500, 3, 3, 8},
+        std::vector<float>{2500, 3, 7, 5},
     };
 
     std::vector<OptimizationType> optimizations{
-        MIN, MAX, MAX, MAX
-    };
+        MIN, MAX, MAX, MAX};
 
-    std::vector<float> weights {
-        0.5, 0.3, 0.1, 0.1
-    };
+    std::vector<float> weights{
+        0.5, 0.3, 0.1, 0.1};
 
-    std::vector<float> vetos {
-        750, 3, 3.5, 3.5
-    };
+    std::vector<float> vetos{
+        750, 3, 3.5, 3.5};
 
     float concordanceThreshold = 0.7;
 
     Electre elV(values, weights, vetos, optimizations, concordanceThreshold);
     elV.processMatrixes();
 
-    // Test parser 
+    // Test parser
     Parser parser = Parser();
 
     if (isFile)
@@ -136,17 +190,17 @@ int main(int argc, char **argv)
         parser.parseWeightFile(filenameWeight);
     }
 
-
     std::vector<std::vector<float>> data = parser.getParsedFile();
     std::vector<float> weightsProm = parser.getParsedWeight();
 
-    for(auto const &weight : weightsProm) {
+    for (auto const &weight : weightsProm)
+    {
         std::cout << weight << ", " << std::endl;
     }
 
     Promethee promethee(data, weightsProm);
     promethee.calculatePreferenceMatrix();
-    //promethee.printPreferenceMatrix();
+    // promethee.printPreferenceMatrix();
 
     std::cout << std::endl
               << " ✅ Preference done ✅ " << std::endl

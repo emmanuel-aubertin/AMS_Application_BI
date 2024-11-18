@@ -19,18 +19,18 @@ all: test
 
 clean:
 	$(PRINT) "\n\e[32m--------| \e[1;32mCLEANING\e[0m\e[32m |--------\e[0m\n\n"
-	rm -f out.bin *.gch 
+	rm -f ams-BI out.bin *.gch 
 	@printf "\e[32m\tDONE\e[0m\n"
 
 compiler: 
 	@printf "\e[32m--------| \e[1;32mCompilation of all your .cpp\e[0m\e[32m |--------\e[0m\n\n"
-	$(COMPILER) -std=c++23 src/*.cpp -o out.bin
+	$(COMPILER) -std=c++23 src/*.cpp -o ams-BI
 	@printf "\e[32m\tDONE\e[0m\n"
 
 
 test: compiler
 	$(PRINT) "\e[32m--------| \e[1mTest of the binary file\e[0m\e[32m |--------\e[0m\n\n"
-	./out.bin -d data/recycle/donnees.csv -w data/recycle/poids.csv
+	./ams-BI -a e
 	$(PRINT) "\e[32m\tDONE\e[0m\n"
 
 .PHONY: all clean test
