@@ -15,7 +15,7 @@ Electre::Electre(
     std::vector<float> weights,
     std::vector<float> vetos,
     std::vector<OptimizationType> optimizations,
-    float concordanceThreshold)
+    float concordanceThreshold) : Electre()
 {
     this->values = values;
     this->weights = weights;
@@ -39,7 +39,7 @@ Electre::Electre(
     std::vector<float> vetos,
     std::vector<float> preferenceThresholds,
     std::vector<OptimizationType> optimizations,
-    float concordanceThreshold) : Electre::Electre(values, weights, vetos, optimizations, concordanceThreshold)
+    float concordanceThreshold) : Electre::Electre(values, weights, vetos, optimizations, concordanceThreshold) 
 {
     this->preferenceThresholds = preferenceThresholds;
 }
@@ -337,3 +337,8 @@ std::vector<bool> Electre::getKernel()
 {
     return kernel;
 }
+
+void Electre::run() {
+        // Implement Electre's logic here
+        std::cout << "Electre is running!" << std::endl; 
+    }

@@ -11,23 +11,13 @@
 #include "../include/Parser.hpp"
 #include "../include/Electre.hpp"
 #include "../include/Promethee.hpp"
+#include "../include/Algo.hpp"
 
 std::string PROGNAME = "ams-BI";
 std::string RELEASE = "Revision 0.1 | Last update 30 Sept 2024";
 std::string AUTHOR = "\033[1mAubertin Emmanuel, Ange Cure, Jerome Chen\033[0m";
 std::string COPYRIGHT = "(c) 2024 " + AUTHOR + "\nFrom https://github.com/emmanuel-aubertin/AMS_Application_BI";
 bool VERBOSE = false;
-
-struct Algo
-{
-    std::string name;
-    std::string argName;
-    std::string description;
-    std::string altInfo;
-
-    explicit Algo(const std::string &name, const std::string &argName, const std::string &description, const std::string &altInfo)
-        : name(name), argName(argName), description(description), altInfo(altInfo) {}
-};
 
 auto print_release = []
 {
@@ -55,7 +45,7 @@ void print_usage(std::vector<Algo> &algo)
               << "          -a | --algo                     Choose the algorithm that you want to run : " << std::endl;
     for (Algo a : algo)
     {
-        std::cout << "                                              " << a.argName << "       " << a.description << " (" << a.altInfo << ")" << std::endl;
+        std::cout << "                                              " << a.getArgName() << "       " << a.getDescription() << " (" << a.getAltInfo() << ")" << std::endl;
     }
     std::cout << "          -d | --data                     Path to data CSV file" << std::endl
               << "          -w | --weight                   Path to weight CSV file" << std::endl
@@ -72,9 +62,8 @@ int main(int argc, char **argv)
               << std::endl;
 
     std::vector<Algo> availableAlgos = {
-        Algo("Promethee", "p", "For Promethee algo", "in development"),
-        Algo("Electre", "e", "For Electre algo", "in development"),
-        Algo("All", "a", "For all algo", "by default")};
+          Electre()
+        };
 
     std::string filename = "";
     bool isFile = false;
@@ -115,14 +104,19 @@ int main(int argc, char **argv)
             if (++i < argc)
             {
                 algoToRun = argv[i];
+                if (algoToRun.find('a') != std::string::npos)
+                {
+                    warning("Algorithm 'a' (All) overrides all other selections.");
+                    algoToRun = "a";
+                    continue;
+                }
 
                 algoToRun.erase(std::remove_if(algoToRun.begin(), algoToRun.end(),
                                                [&availableAlgos](char c)
                                                {
                                                    bool isValid = std::any_of(availableAlgos.begin(), availableAlgos.end(),
-                                                                              [c](const Algo &a)
-                                                                              { return a.argName == std::string(1, c); });
-
+                                                                              [c](Algo &a)
+                                                                              { return a.getArgName() == std::string(1, c); });
                                                    if (!isValid)
                                                    {
                                                        warning(std::string(1, c) + " is not a valid algorithm");
@@ -152,32 +146,6 @@ int main(int argc, char **argv)
             failure("Unknow argument : " + arg);
         }
     }
-
-    // Test Electre
-    std::vector<std::vector<float>> values{
-        std::vector<float>{4500, 7, 7, 8},
-        std::vector<float>{4000, 7, 3, 8},
-        std::vector<float>{4000, 5, 7, 8},
-        std::vector<float>{3500, 5, 7, 5},
-        std::vector<float>{3500, 5, 7, 8},
-        std::vector<float>{3500, 3, 3, 8},
-        std::vector<float>{2500, 3, 7, 5},
-    };
-
-    std::vector<OptimizationType> optimizations{
-        MIN, MAX, MAX, MAX};
-
-    std::vector<float> weights{
-        0.5, 0.3, 0.1, 0.1};
-
-    std::vector<float> vetos{
-        750, 3, 3.5, 3.5};
-
-    float concordanceThreshold = 0.7;
-
-    Electre elV(values, weights, vetos, optimizations, concordanceThreshold);
-    elV.processMatrixes();
-
     // Test parser
     Parser parser = Parser();
 
@@ -190,24 +158,7 @@ int main(int argc, char **argv)
         parser.parseWeightFile(filenameWeight);
     }
 
-    std::vector<std::vector<float>> data = parser.getParsedFile();
-    std::vector<float> weightsProm = parser.getParsedWeight();
-
-    for (auto const &weight : weightsProm)
-    {
-        std::cout << weight << ", " << std::endl;
-    }
-
-    Promethee promethee(data, weightsProm);
-    promethee.calculatePreferenceMatrix();
-    // promethee.printPreferenceMatrix();
-
-    std::cout << std::endl
-              << " ✅ Preference done ✅ " << std::endl
-              << std::endl;
-
-    promethee.calculateFlows();
-    promethee.printLatexOutput();
+    
 
     return 0;
 }
