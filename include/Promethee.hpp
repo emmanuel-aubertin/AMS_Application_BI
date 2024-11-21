@@ -4,8 +4,9 @@
 #include <vector>
 #include <iostream>
 #include <iomanip>
+#include "Algo.hpp"
 
-class Promethee
+class Promethee : public Algo
 {
 private:
     std::vector<std::vector<float>> data;                          // Alternatives and criteria
@@ -19,6 +20,7 @@ private:
 
 public:
     Promethee(std::vector<std::vector<float>> data, std::vector<float> weights);
+    Promethee() : Algo("Promethee", "p", "For Promethee algo", "in development") {};
     void calculatePreferenceMatrix();
     void printPreferenceMatrix();
 

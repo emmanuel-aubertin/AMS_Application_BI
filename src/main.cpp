@@ -62,7 +62,8 @@ int main(int argc, char **argv)
               << std::endl;
 
     std::vector<Algo> availableAlgos = {
-          Electre()
+          Electre(),
+          Promethee(),
         };
 
     std::string filename = "";

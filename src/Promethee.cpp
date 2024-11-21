@@ -9,7 +9,7 @@
  * @param data A 2D vector where each row represents an alternative and each column represents a criterion.
  * @param weights A vector representing the weights for each criterion.
  */
-Promethee::Promethee(std::vector<std::vector<float>> data, std::vector<float> weights)
+Promethee::Promethee(std::vector<std::vector<float>> data, std::vector<float> weights) : Promethee()
 {
     this->data = data;
     this->weights = weights;
