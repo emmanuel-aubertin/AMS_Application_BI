@@ -1,5 +1,11 @@
 #include "../include/Electre.hpp"
 
+#define RESET "\033[0m"
+#define RED "\033[31m"
+#define GREEN "\033[32m"
+#define YELLOW "\033[33m"
+#define BLUE "\033[34m"
+
 /**
  * @brief Constructs an Electre object.
  *
@@ -44,16 +50,7 @@ Electre::Electre(
     this->preferenceThresholds = preferenceThresholds;
 }
 
-/**
- * @brief Processes the data to calculate the concordance and discordance matrices.
- */
-void Electre::processMatrixes()
-{
-    processConcordance();
-    processNondiscordance();
-    processDominance();
-    processKernel();
-}
+
 
 /**
  * @brief Calculates the concordance matrix.
@@ -420,7 +417,31 @@ void Electre::setKernel(const std::vector<bool> &newKernel)
 }
 
 
-void Electre::run() {
-        // Implement Electre's logic here
-        std::cout << "Electre is running!" << std::endl; 
-    }
+
+
+void Electre::run()
+{
+    std::cout << GREEN << "========== Starting Electre Algorithm ==========" << RESET << "\n";
+
+    // Step 1: Process concordance matrix
+    std::cout << BLUE << "[Step 1/4]" << RESET << " Processing the concordance matrix..." << std::endl;
+    processConcordance();
+    std::cout << GREEN << "✔ Concordance matrix processed successfully." << RESET << "\n";
+
+    // Step 2: Process nondiscordance matrix
+    std::cout << BLUE << "[Step 2/4]" << RESET << " Processing the nondiscordance matrix..." << std::endl;
+    processNondiscordance();
+    std::cout << GREEN << "✔ Nondiscordance matrix processed successfully." << RESET << "\n";
+
+    // Step 3: Compute dominance relations
+    std::cout << BLUE << "[Step 3/4]" << RESET << " Computing dominance relations..." << std::endl;
+    processDominance();
+    std::cout << GREEN << "✔ Dominance relations computed successfully." << RESET << "\n";
+
+    // Step 4: Identify the kernel
+    std::cout << BLUE << "[Step 4/4]" << RESET << " Identifying the kernel (final decision set)..." << std::endl;
+    processKernel();
+    std::cout << GREEN << "✔ Kernel identified successfully." << RESET << "\n";
+
+    std::cout << GREEN << "========== Electre Algorithm Completed ==========" << RESET << "\n";
+}

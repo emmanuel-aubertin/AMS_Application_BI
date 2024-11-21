@@ -1,5 +1,12 @@
 #include "../include/Promethee.hpp"
 
+#define RESET "\033[0m"
+#define RED "\033[31m"
+#define GREEN "\033[32m"
+#define YELLOW "\033[33m"
+#define BLUE "\033[34m"
+
+
 /**
  * @brief Construct a new Promethee object.
  *
@@ -13,7 +20,6 @@ Promethee::Promethee(std::vector<std::vector<float>> data, std::vector<float> we
 {
     this->data = data;
     this->weights = weights;
-    multicriteriaPreferenceMatrix.resize(data.size(), std::vector<float>(data.size(), -1)); // Initialize the matrix
 }
 
 /**
@@ -43,7 +49,7 @@ float Promethee::calculatePreference(float value1, float value2)
 void Promethee::calculatePreferenceMatrix()
 {
     int n = data.size();    // Number of alternatives
-    int m = data[0].size(); // Number of criteria
+    int m = data[0].size(); // Number of criterias
 
     for (int i = 0; i < n; ++i)
     {
@@ -51,17 +57,15 @@ void Promethee::calculatePreferenceMatrix()
         {
             if (i == j)
             {
-                multicriteriaPreferenceMatrix[i][j] = 1; // Diagonal element
+                multicriteriaPreferenceMatrix[i][j] = 1.0; // Diagonal element
+                continue;
             }
-            else
+            float preferenceSum = 0.0f;
+            for (int k = 0; k < m; ++k)
             {
-                float preferenceSum = 0.0f;
-                for (int k = 0; k < m; ++k)
-                {
-                    preferenceSum += calculatePreference(data[k][i], data[k][j]) * weights[k];
-                }
-                multicriteriaPreferenceMatrix[i][j] = preferenceSum; // Store the final weighted preference in the matrix
+                preferenceSum += calculatePreference(data[k][i], data[k][j]) * weights[k];
             }
+            multicriteriaPreferenceMatrix[i][j] = preferenceSum; // Store the final weighted preference in the matrix
         }
     }
 }
@@ -166,7 +170,24 @@ void Promethee::printLatexOutput()
     std::cout << "\\end{table} \n";
 }
 
-void Promethee::run() {
-    // Implement Electre's logic here
-    std::cout << "Promethee is running!" << std::endl; 
+void Promethee::run()
+{
+    std::cout << GREEN << "========== Starting Promethee Algorithm ==========" << RESET << "\n";
+
+    // Step 1: Initialize variables
+    std::cout << BLUE << "[Step 1/3]" << RESET << " Initializing variables..." << std::endl;
+    multicriteriaPreferenceMatrix.resize(data.size(), std::vector<float>(data.size(), -1));
+    std::cout << GREEN << "✔ Variables initialized successfully." << RESET << "\n";
+
+    // Step 2: Process preference matrix
+    std::cout << BLUE << "[Step 2/3]" << RESET << " Calculating the preference matrix..." << std::endl;
+    calculatePreferenceMatrix();
+    std::cout << GREEN << "✔ Preference matrix calculated successfully." << RESET << "\n";
+
+    // Step 3: Compute flows
+    std::cout << BLUE << "[Step 3/3]" << RESET << " Computing positive and negative flows..." << std::endl;
+    calculateFlows();
+    std::cout << GREEN << "✔ Flows computed successfully." << RESET << "\n";
+
+    std::cout << GREEN << "========== Promethee Algorithm Completed ==========" << RESET << "\n";
 }
