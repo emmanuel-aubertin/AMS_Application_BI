@@ -338,27 +338,6 @@ std::vector<bool> Electre::getKernel()
     return kernel;
 }
 
-/**
- * @brief Set the values matrix (alternatives and criteria).
- *
- * @param newValues A 2D vector representing the alternatives and criteria.
- */
-void Electre::setValues(const std::vector<std::vector<float>> &newValues)
-{
-    values = newValues;
-    nbCandidates = values.size();
-    nbCriteria = values.empty() ? 0 : values[0].size();
-}
-
-/**
- * @brief Set the weights for each criterion.
- *
- * @param newWeights A vector of weights corresponding to the criteria.
- */
-void Electre::setWeights(const std::vector<float> &newWeights)
-{
-    weights = newWeights;
-}
 
 /**
  * @brief Set the veto thresholds for each criterion.

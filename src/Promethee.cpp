@@ -165,3 +165,8 @@ void Promethee::printLatexOutput()
     std::cout << "\\label{tab:promethee_flows} \n";
     std::cout << "\\end{table} \n";
 }
+
+void Promethee::run() {
+    // Implement Electre's logic here
+    std::cout << "Promethee is running!" << std::endl; 
+}

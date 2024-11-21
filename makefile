@@ -30,7 +30,7 @@ compiler:
 
 test: compiler
 	$(PRINT) "\e[32m--------| \e[1mTest of the binary file\e[0m\e[32m |--------\e[0m\n\n"
-	./ams-BI -a e
+	./ams-BI --help
 	$(PRINT) "\e[32m\tDONE\e[0m\n"
 
 .PHONY: all clean test

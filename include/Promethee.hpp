@@ -23,8 +23,7 @@ public:
     Promethee() : Algo("Promethee", "p", "For Promethee algo", "in development") {};
 
     // Setters
-    void setData(const std::vector<std::vector<float>> &newData) { data = newData; }
-    void setWeights(const std::vector<float> &newWeights) { weights = newWeights; }
+
     void setMulticriteriaPreferenceMatrix(const std::vector<std::vector<float>> &newMatrix) { multicriteriaPreferenceMatrix = newMatrix; }
     void setFlows(const std::vector<float> &newFlows) { flows = newFlows; }
     void setPositiveFlow(const std::vector<float> &newPositiveFlow) { positiveFlow = newPositiveFlow; }
