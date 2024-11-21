@@ -338,6 +338,109 @@ std::vector<bool> Electre::getKernel()
     return kernel;
 }
 
+/**
+ * @brief Set the values matrix (alternatives and criteria).
+ *
+ * @param newValues A 2D vector representing the alternatives and criteria.
+ */
+void Electre::setValues(const std::vector<std::vector<float>> &newValues)
+{
+    values = newValues;
+    nbCandidates = values.size();
+    nbCriteria = values.empty() ? 0 : values[0].size();
+}
+
+/**
+ * @brief Set the weights for each criterion.
+ *
+ * @param newWeights A vector of weights corresponding to the criteria.
+ */
+void Electre::setWeights(const std::vector<float> &newWeights)
+{
+    weights = newWeights;
+}
+
+/**
+ * @brief Set the veto thresholds for each criterion.
+ *
+ * @param newVetos A vector representing the veto thresholds.
+ */
+void Electre::setVetos(const std::vector<float> &newVetos)
+{
+    vetos = newVetos;
+}
+
+/**
+ * @brief Set the preference thresholds for each criterion.
+ *
+ * @param newThresholds A vector representing the preference thresholds.
+ */
+void Electre::setPreferenceThresholds(const std::vector<float> &newThresholds)
+{
+    preferenceThresholds = newThresholds;
+}
+
+/**
+ * @brief Set the optimization types for the criteria.
+ *
+ * @param newOptimizations A vector of optimization types (e.g., Minimize, Maximize).
+ */
+void Electre::setOptimizations(const std::vector<OptimizationType> &newOptimizations)
+{
+    optimizations = newOptimizations;
+}
+
+/**
+ * @brief Set the concordance threshold.
+ *
+ * @param newThreshold The new concordance threshold.
+ */
+void Electre::setConcordanceThreshold(float newThreshold)
+{
+    concordanceThreshold = newThreshold;
+}
+
+/**
+ * @brief Set the concordance matrix.
+ *
+ * @param newConcordance A 2D vector representing the concordance matrix.
+ */
+void Electre::setConcordanceMatrix(const std::vector<std::vector<float>> &newConcordance)
+{
+    concordance = newConcordance;
+}
+
+/**
+ * @brief Set the non-discordance matrix.
+ *
+ * @param newNonDiscordance A 2D vector of booleans representing the non-discordance matrix.
+ */
+void Electre::setNonDiscordanceMatrix(const std::vector<std::vector<bool>> &newNonDiscordance)
+{
+    nonDiscordance = newNonDiscordance;
+}
+
+/**
+ * @brief Set the dominance matrix.
+ *
+ * @param newDominance A 2D vector of booleans representing the dominance matrix.
+ */
+void Electre::setDominanceMatrix(const std::vector<std::vector<bool>> &newDominance)
+{
+    dominance = newDominance;
+}
+
+/**
+ * @brief Set the kernel.
+ *
+ * @param newKernel A vector of booleans representing the kernel.
+ */
+void Electre::setKernel(const std::vector<bool> &newKernel)
+{
+    kernel = newKernel;
+}
+
+
 void Electre::run() {
         // Implement Electre's logic here
         std::cout << "Electre is running!" << std::endl; 

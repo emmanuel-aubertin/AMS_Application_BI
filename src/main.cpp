@@ -62,9 +62,11 @@ int main(int argc, char **argv)
               << std::endl;
 
     std::vector<Algo> availableAlgos = {
-          Electre(),
-          Promethee(),
-        };
+        Algo("All", "a", "Run all algorithms", "(by default)"),
+        Electre(),
+        Promethee()
+
+    };
 
     std::string filename = "";
     bool isFile = false;
@@ -150,6 +152,11 @@ int main(int argc, char **argv)
     // Test parser
     Parser parser = Parser();
 
+    if (!isFile && !isWeightFile)
+    {
+        failure("You must specify a dataset file and/or weight file");
+    }
+
     if (isFile)
     {
         parser.parseFile(filename);
@@ -159,7 +166,15 @@ int main(int argc, char **argv)
         parser.parseWeightFile(filenameWeight);
     }
 
-    
+    auto it = std::ranges::find_if(availableAlgos, [&](const auto &algo)
+                                   { return std::any_of(availableAlgos.begin(), availableAlgos.end(),
+                                                        [c](Algo &a)
+                                                        { return a.getArgName() == std::string(1, c); }); });
+
+    if (it != availableAlgos.end())
+    {
+        
+    }
 
     return 0;
 }
