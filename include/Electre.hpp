@@ -52,6 +52,17 @@ public:
         float concordanceThreshold);
 
     Electre() : Algo("Electre", "e", "For Electre algo", "in development") {};
+
+    // Setters
+    void setVetos(const std::vector<float> &newVetos);
+    void setPreferenceThresholds(const std::vector<float> &newThresholds);
+    void setOptimizations(const std::vector<OptimizationType> &newOptimizations);
+    void setConcordanceThreshold(float newThreshold);
+    void setConcordanceMatrix(const std::vector<std::vector<float>> &newConcordance);
+    void setNonDiscordanceMatrix(const std::vector<std::vector<bool>> &newNonDiscordance);
+    void setDominanceMatrix(const std::vector<std::vector<bool>> &newDominance);
+    void setKernel(const std::vector<bool> &newKernel);
+
     void processMatrixes();
     std::vector<bool> getKernel();
     void run() override;
