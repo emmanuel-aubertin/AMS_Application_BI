@@ -54,11 +54,12 @@ void Parser::parseFile(const std::string &filename)
             result.push_back(split(line));
         }
         file.close();
-    } else
+    }
+    else
     {
         std::cerr << "Error: " << filename << std::endl;
     }
-    
+
     this->parsedFile = result;
 }
 

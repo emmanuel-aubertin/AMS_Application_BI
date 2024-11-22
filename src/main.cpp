@@ -178,7 +178,7 @@ int main(int argc, char **argv)
         if (it != availableAlgos.end())
         {
             std::cout << BLUE << "\033[1mExecuting: " << (*it)->getName() << RESET << std::endl;
-            
+
             if (auto *electre = dynamic_cast<Electre *>(it->get()))
             {
                 electre->setData(data);

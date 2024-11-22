@@ -10,7 +10,7 @@ public:
     Parser(char delimiter = ',');
     std::vector<float> split(const std::string &s);
     std::vector<float> splitFloat(const std::string &s);
-    
+
     void parseFile(const std::string &filename);
     void print() const;
     std::vector<std::vector<float>> getParsedFile();

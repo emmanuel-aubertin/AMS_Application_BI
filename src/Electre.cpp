@@ -45,12 +45,10 @@ Electre::Electre(
     std::vector<float> vetos,
     std::vector<float> preferenceThresholds,
     std::vector<OptimizationType> optimizations,
-    float concordanceThreshold) : Electre::Electre(values, weights, vetos, optimizations, concordanceThreshold) 
+    float concordanceThreshold) : Electre::Electre(values, weights, vetos, optimizations, concordanceThreshold)
 {
     this->preferenceThresholds = preferenceThresholds;
 }
-
-
 
 /**
  * @brief Calculates the concordance matrix.
@@ -335,7 +333,6 @@ std::vector<bool> Electre::getKernel()
     return kernel;
 }
 
-
 /**
  * @brief Set the veto thresholds for each criterion.
  *
@@ -415,9 +412,6 @@ void Electre::setKernel(const std::vector<bool> &newKernel)
 {
     kernel = newKernel;
 }
-
-
-
 
 void Electre::run()
 {

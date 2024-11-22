@@ -6,7 +6,6 @@
 #define YELLOW "\033[33m"
 #define BLUE "\033[34m"
 
-
 /**
  * @brief Construct a new Promethee object.
  *

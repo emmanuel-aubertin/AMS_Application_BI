@@ -18,13 +18,11 @@ private:
 
 public:
     Promethee(std::vector<std::vector<float>> data, std::vector<float> weights);
-    Promethee() : Algo("Promethee", "p", "For Promethee algo", "in development")
-    {
-        
-    };
+    Promethee() : Algo("Promethee", "p", "For Promethee algo", "in development") {
+
+                  };
 
     // Setters
-
     void setMulticriteriaPreferenceMatrix(const std::vector<std::vector<float>> &newMatrix) { multicriteriaPreferenceMatrix = newMatrix; }
     void setFlows(const std::vector<float> &newFlows) { flows = newFlows; }
     void setPositiveFlow(const std::vector<float> &newPositiveFlow) { positiveFlow = newPositiveFlow; }
@@ -32,11 +30,9 @@ public:
 
     void calculatePreferenceMatrix();
     void printPreferenceMatrix();
-
     void calculateFlows();
     void printFlows();
     void printLatexOutput();
-
     void run() override;
 };
 
