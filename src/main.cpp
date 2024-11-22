@@ -15,7 +15,7 @@
 #define BLUE "\033[34m"
 
 std::string PROGNAME = "ams-BI";
-std::string RELEASE = "Revision 0.1 | Last update 30 Sept 2024";
+std::string RELEASE = "Revision 0.1 | Last update 22 Nov 2024";
 std::string AUTHOR = "\033[1mAubertin Emmanuel, Ange Cure, Jerome Chen\033[0m";
 std::string COPYRIGHT = "(c) 2024 " + AUTHOR + "\nFrom https://github.com/emmanuel-aubertin/AMS_Application_BI";
 bool VERBOSE = false;
@@ -43,16 +43,16 @@ void print_usage(const std::vector<std::unique_ptr<Algo>> &algo)
               << "\033[1mUsage: \033[0m" << PROGNAME << " & [-d | --data] | [-h | --help] | [-v | --version] " << std::endl
               << "          -h | --help                     Help" << std::endl
               << "          -v | --version                  Version" << std::endl
-              << "          -a | --algo                     Choose the algorithm that you want to run : " << std::endl;
+              << "          -a | --algo                     Choose the algorithm that you want to run : " << std::endl
+              << "          -d | --data                     Path to data CSV file" << std::endl
+              << "          -w | --weight                   Path to weight CSV file" << std::endl;
     for (const auto &a : algo)
     {
         std::cout << "                                              " << a->getArgName() << "       " << a->getDescription() << " (" << a->getAltInfo() << ")" << std::endl;
     }
-    std::cout << "          -d | --data                     Path to data CSV file" << std::endl
-              << "          -w | --weight                   Path to weight CSV file" << std::endl
-              << std::endl
+    std::cout << std::endl
               << "\033[1mExample to run Electre:\033[0m " << std::endl
-              << PROGNAME << " -a e -d data.csv -w weights.csv" << std::endl;
+              << PROGNAME << " -a e -d data/recycle/donnees.csv -w data/recycle/poids.csv" << std::endl;
 };
 
 int main(int argc, char **argv)
@@ -63,7 +63,7 @@ int main(int argc, char **argv)
               << std::endl;
 
     std::vector<std::unique_ptr<Algo>> availableAlgos;
-    availableAlgos.push_back(std::make_unique<Algo>("All", "a", "Run all algorithms", "(by default)"));
+    availableAlgos.push_back(std::make_unique<Algo>("All", "a", "Run all algorithms", "by default"));
     availableAlgos.push_back(std::make_unique<Electre>());
     availableAlgos.push_back(std::make_unique<Promethee>());
 
