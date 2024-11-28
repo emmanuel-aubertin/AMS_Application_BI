@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <memory>
 #include <string.h>
+#include <filesystem>
 #include "../include/Parser.hpp"
 #include "../include/Electre.hpp"
 #include "../include/Promethee.hpp"
@@ -43,9 +44,10 @@ void print_usage(const std::vector<std::unique_ptr<Algo>> &algo)
               << "\033[1mUsage: \033[0m" << PROGNAME << " & [-d | --data] | [-h | --help] | [-v | --version] " << std::endl
               << "          -h | --help                     Help" << std::endl
               << "          -v | --version                  Version" << std::endl
-              << "          -a | --algo                     Choose the algorithm that you want to run : " << std::endl
+              << "          -s | --save                     Path to the output file" << std::endl
               << "          -d | --data                     Path to data CSV file" << std::endl
-              << "          -w | --weight                   Path to weight CSV file" << std::endl;
+              << "          -w | --weight                   Path to weight CSV file" << std::endl
+              << "          -a | --algo                     Choose the algorithm that you want to run : " << std::endl;
     for (const auto &a : algo)
     {
         std::cout << "                                              " << a->getArgName() << "       " << a->getDescription() << " (" << a->getAltInfo() << ")" << std::endl;
@@ -67,6 +69,8 @@ int main(int argc, char **argv)
     availableAlgos.push_back(std::make_unique<Electre>());
     availableAlgos.push_back(std::make_unique<Promethee>());
 
+    std::string outputFile = "";
+
     std::string filename = "";
     bool isFile = false;
 
@@ -74,6 +78,8 @@ int main(int argc, char **argv)
     bool isWeightFile = false;
 
     std::string algoToRun = "a";
+
+    std::string extension = "";
 
     // Arg parser
     if (argc < 0)
@@ -92,6 +98,10 @@ int main(int argc, char **argv)
         {
             print_release();
             return 0;
+        }
+        else if (!strcmp(argv[i], "-s") || !strcmp(argv[i], "--save"))
+        {
+            outputFile = argv[++i];
         }
         else if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--data"))
         {
@@ -184,6 +194,7 @@ int main(int argc, char **argv)
                 electre->setData(data);
                 electre->setWeights(weightsProm);
                 electre->run();
+                
             }
             else if (auto *promethee = dynamic_cast<Promethee *>(it->get()))
             {

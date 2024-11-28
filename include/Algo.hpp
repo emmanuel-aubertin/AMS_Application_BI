@@ -2,6 +2,7 @@
 #define ALGO_HPP
 
 #include <string>
+#include <iostream>
 
 class Algo
 {
@@ -19,6 +20,7 @@ public:
 
     // Pure virtual function to be implemented by subclasses
     virtual void run() { std::cout << "Pure virtual function, must be implemented by subclasses" << std::endl; };
+    virtual int save(std::string filePath);
 
 protected:
     std::string name;
