@@ -3,6 +3,7 @@
 
 #include <string>
 #include <iostream>
+#include <vector>
 
 class Algo
 {
@@ -20,7 +21,7 @@ public:
 
     // Pure virtual function to be implemented by subclasses
     virtual void run() { std::cout << "Pure virtual function, must be implemented by subclasses" << std::endl; };
-    virtual int save(std::string filePath);
+    virtual int save(std::string dirPath);
 
 protected:
     std::string name;

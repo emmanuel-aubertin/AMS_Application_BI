@@ -169,6 +169,59 @@ void Promethee::printLatexOutput()
     std::cout << "\\end{table} \n";
 }
 
+int Promethee::save(std::string dirPath)
+{
+    std::filesystem::path folderPath = std::filesystem::path(dirPath) / "Promethee";
+
+    if (!std::filesystem::exists(folderPath)) {
+        if (!std::filesystem::create_directories(folderPath)) {
+            std::cerr << "Error creating directory: " << folderPath << std::endl;
+            return -1;
+        }
+    }
+
+
+    std::filesystem::path filePath = folderPath / "multicriteriaPreferenceMatrix.csv";
+    std::ofstream outputFileMatrix(filePath);
+
+    if (!outputFileMatrix) {
+        std::cerr << "Error creating file for writing" << std::endl;
+        return -1;
+    }
+
+    for (const auto& row : this->multicriteriaPreferenceMatrix) {
+        for (size_t i = 0; i < row.size(); ++i) {
+            outputFileMatrix << row[i];
+            if (i < row.size() - 1) {
+                outputFileMatrix << ";";
+            }
+        }
+        outputFileMatrix << "\n";
+    }
+
+    outputFileMatrix.close();
+
+
+    filePath = folderPath / "flowsData.csv";
+    std::ofstream outputFileFlow(filePath);
+
+    if (!outputFileFlow) {
+        std::cerr << "Error creating file for writing" << std::endl;
+        return -1;
+    }
+    outputFileFlow << "Flow,Positive Flow,Negative Flow\n";
+
+    for (size_t i = 0; i < flows.size(); ++i) {
+        outputFileFlow << flows[i] << "," 
+                   << positiveFlow[i] << "," 
+                   << negativeFlow[i] << "\n";
+    }
+
+    outputFileFlow.close();
+
+    return 1;
+}
+
 void Promethee::run()
 {
     std::cout << GREEN << "========== Starting Promethee Algorithm ==========" << RESET << "\n";

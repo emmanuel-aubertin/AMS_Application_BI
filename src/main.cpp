@@ -194,6 +194,7 @@ int main(int argc, char **argv)
                 electre->setData(data);
                 electre->setWeights(weightsProm);
                 electre->run();
+                electre->save(outputFile);
                 
             }
             else if (auto *promethee = dynamic_cast<Promethee *>(it->get()))
@@ -201,6 +202,7 @@ int main(int argc, char **argv)
                 promethee->setData(data);
                 promethee->setWeights(weightsProm);
                 promethee->run();
+                promethee->save(outputFile);
             }
         }
         else

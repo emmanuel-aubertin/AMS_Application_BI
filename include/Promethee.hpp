@@ -4,6 +4,8 @@
 #include <vector>
 #include <iostream>
 #include <iomanip>
+#include <fstream>
+#include <filesystem>
 #include "Algo.hpp"
 
 class Promethee : public Algo
@@ -34,6 +36,7 @@ public:
     void printFlows();
     void printLatexOutput();
     void run() override;
+    virtual int save(std::string dirPath) override;
 };
 
 #endif
