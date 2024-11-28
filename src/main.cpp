@@ -65,7 +65,6 @@ int main(int argc, char **argv)
               << std::endl;
 
     std::vector<std::unique_ptr<Algo>> availableAlgos;
-    availableAlgos.push_back(std::make_unique<Algo>("All", "a", "Run all algorithms", "by default"));
     availableAlgos.push_back(std::make_unique<Electre>());
     availableAlgos.push_back(std::make_unique<Promethee>());
 
@@ -118,12 +117,6 @@ int main(int argc, char **argv)
             if (++i < argc)
             {
                 algoToRun = argv[i];
-                if (algoToRun.find('a') != std::string::npos)
-                {
-                    warning("Algorithm 'a' (All) overrides all other selections.");
-                    algoToRun = "a";
-                    continue;
-                }
 
                 algoToRun.erase(std::remove_if(algoToRun.begin(), algoToRun.end(),
                                                [&availableAlgos](char c)
@@ -194,15 +187,20 @@ int main(int argc, char **argv)
                 electre->setData(data);
                 electre->setWeights(weightsProm);
                 electre->run();
-                electre->save(outputFile);
-                
+                if (outputFile != "")
+                {
+                    electre->save(outputFile);
+                }
             }
             else if (auto *promethee = dynamic_cast<Promethee *>(it->get()))
             {
                 promethee->setData(data);
                 promethee->setWeights(weightsProm);
                 promethee->run();
+                if (outputFile != "")
+                {
                 promethee->save(outputFile);
+                }
             }
         }
         else
