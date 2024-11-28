@@ -333,6 +333,7 @@ std::vector<bool> Electre::getKernel()
     return kernel;
 }
 
-void Electre::run() {
+void Electre::run() 
+{
     processMatrixes();
 }
