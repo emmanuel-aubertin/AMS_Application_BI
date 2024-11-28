@@ -195,11 +195,6 @@ void Electre::processKernel()
             kernel[x] = false;
         }
     }
-
-    std::cout << "Kernel" << std::endl;
-    for (bool val : kernel)
-        std::cout << val << " ";
-    std::cout << std::endl;
 }
 
 std::vector<std::vector<int>> Electre::getCycles()
@@ -339,6 +334,5 @@ std::vector<bool> Electre::getKernel()
 }
 
 void Electre::run() {
-        // Implement Electre's logic here
-        std::cout << "Electre is running!" << std::endl; 
-    }
+    processMatrixes();
+}
