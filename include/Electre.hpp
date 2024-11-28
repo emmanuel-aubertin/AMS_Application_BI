@@ -5,6 +5,8 @@
 #include <array>
 #include <cmath>
 #include <iostream>
+#include <fstream>
+#include <filesystem>
 #include "OptimizationType.hpp"
 #include "Algo.hpp"
 
@@ -66,6 +68,7 @@ public:
     void processMatrixes();
     std::vector<bool> getKernel();
     void run() override;
+    virtual int save(std::string dirPath) override;
 };
 
 #endif

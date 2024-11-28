@@ -413,6 +413,36 @@ void Electre::setKernel(const std::vector<bool> &newKernel)
     kernel = newKernel;
 }
 
+
+int Electre::save(std::string dirPath)
+{
+    std::filesystem::path folderPath = std::filesystem::path(dirPath) / "Electre";
+
+    if (!std::filesystem::exists(folderPath)) {
+        if (!std::filesystem::create_directories(folderPath)) {
+            std::cerr << "Error creating directory: " << folderPath << std::endl;
+            return -1;
+        }
+    }
+
+
+    std::filesystem::path filePath = folderPath / "kernel.csv";
+    std::ofstream outputFileKernel(filePath);
+
+    if (!outputFileKernel) {
+        std::cerr << "Error creating file for writing" << std::endl;
+        return -1;
+    }
+
+    for (const auto& row : this->kernel) {
+        outputFileKernel << row << "/n";
+    }
+
+    outputFileKernel.close();
+
+    return 1;
+}
+
 void Electre::run()
 {
     std::cout << GREEN << "========== Starting Electre Algorithm ==========" << RESET << "\n";
