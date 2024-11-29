@@ -170,7 +170,7 @@ int main(int argc, char **argv)
     }
 
     std::vector<std::vector<float>> data = parser.getParsedFile();
-    std::vector<float> weightsProm = parser.getParsedWeight();
+    std::vector<float> weights = parser.getParsedWeight();
 
     for (const char c : algoToRun)
     {
@@ -185,7 +185,7 @@ int main(int argc, char **argv)
             if (auto *electre = dynamic_cast<Electre *>(it->get()))
             {
                 electre->setData(data);
-                electre->setWeights(weightsProm);
+                electre->setWeights(weights);
                 electre->run();
                 if (outputFile != "")
                 {
@@ -194,9 +194,31 @@ int main(int argc, char **argv)
             }
             else if (auto *promethee = dynamic_cast<Promethee *>(it->get()))
             {
+                std::vector<std::vector<float>> data {
+                    {-80, 90, -600, -5.4, -8, 5},
+                    {-65, 58, -200, -9.7, -1, 1},
+                    {-83, 60, -400, -7.2, -4, 7},
+                    {-40, 80, -1000, -7.5, -7, 10},
+                    {-52, 72, -600, -2.0, -3, 8},
+                    {-94, 96, -700, -3.6, -5, 6},
+                };
+
+
+
+                std::vector<float> weights {
+                    0.1, 0.2, 0.2, 0.1, 0.2, 0.2
+                };
+
+                // Promethee pr = Promethee(data, weights);
+                // pr.calculatePreferenceMatrix();
+                // pr.printPreferenceMatrix();
+
+
                 promethee->setData(data);
-                promethee->setWeights(weightsProm);
+                promethee->setWeights(weights);
                 promethee->run();
+                promethee->printPreferenceMatrix();
+                promethee->printFlows();
                 if (outputFile != "")
                 {
                 promethee->save(outputFile);

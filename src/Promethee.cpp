@@ -33,7 +33,7 @@ Promethee::Promethee(std::vector<std::vector<float>> data, std::vector<float> we
  */
 float Promethee::calculatePreference(float value1, float value2)
 {
-    return (value1 > value2) ? 0.0 : 1.0;
+    return (value1 > value2) ? 1.0 : 0.0;
 }
 
 /**
@@ -47,8 +47,8 @@ float Promethee::calculatePreference(float value1, float value2)
  */
 void Promethee::calculatePreferenceMatrix()
 {
-    int n = data.size();    // Number of alternatives
-    int m = data[0].size(); // Number of criterias
+    int n = data.size(); // Number of alternatives
+    int m = data[0].size();    // Number of criterias
 
     for (int i = 0; i < n; ++i)
     {
@@ -56,13 +56,13 @@ void Promethee::calculatePreferenceMatrix()
         {
             if (i == j)
             {
-                multicriteriaPreferenceMatrix[i][j] = 1.0; // Diagonal element
+                multicriteriaPreferenceMatrix[i][j] = 0.0; // Diagonal element
                 continue;
             }
             float preferenceSum = 0.0f;
             for (int k = 0; k < m; ++k)
             {
-                preferenceSum += calculatePreference(data[k][i], data[k][j]) * weights[k];
+                preferenceSum += calculatePreference(data[i][k], data[j][k]) * weights[k];
             }
             multicriteriaPreferenceMatrix[i][j] = preferenceSum; // Store the final weighted preference in the matrix
         }
@@ -218,6 +218,8 @@ int Promethee::save(std::string dirPath)
     }
 
     outputFileFlow.close();
+
+    // rajouter les graphes, "kernel"
 
     return 1;
 }
