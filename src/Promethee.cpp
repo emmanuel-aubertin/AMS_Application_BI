@@ -159,13 +159,6 @@ std::vector<int> Promethee::calculatePosition(std::vector<float> valuesVec, Opti
             // no need to check if the other alternative is better if they are the same alternative
             if (currentAlt == otherAlt)
                 continue;
-            
-            if (currentAlt == 3 && otherAlt == 5) {
-                std::cout << currentAltValue << std::endl;
-                std::cout << valuesVec[otherAlt] << std::endl;
-                std::cout << "<" << (currentAltValue < valuesVec[otherAlt]) << std::endl;
-                std::cout << "==" << (currentAltValue == valuesVec[otherAlt]) << std::endl;
-            }
 
             if (order == MAX) {
                 if (currentAltValue < valuesVec[otherAlt]) {
