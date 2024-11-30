@@ -123,6 +123,66 @@ void Promethee::calculateFlows()
 }
 
 /**
+ * @brief Calculate the best alternatives for each type of alternative
+ * 
+ * For the bestAlternativesPositive, bestAlternativesNegative and bestAlternativesOverall vectors, 
+ * the int at each index represents the position of the alternative at said index. 
+ * For example, the vector <5, 2, 3, 4, 1> means that the alternative at index 4 is the best, 0 the worse, and so on.
+ */
+void Promethee::calculateBestCandidates() {
+    printFlows();
+    bestAlternativesPositive = calculatePosition(positiveFlow, MAX);
+    bestAlternativesNegative = calculatePosition(negativeFlow, MIN);
+    bestAlternativesOverall = calculatePosition(flows, MAX);
+
+    for (int val : bestAlternativesPositive) {
+        std::cout << val << " ";
+    } std::cout << std::endl;
+    
+    for (int val : bestAlternativesNegative) {
+        std::cout << val << " ";
+    } std::cout << std::endl;
+    
+    for (int val : bestAlternativesOverall) {
+        std::cout << val << " ";
+    } std::cout << std::endl;
+}
+
+std::vector<int> Promethee::calculatePosition(std::vector<float> valuesVec, OptimizationType order) {
+    std::vector<int> returnVec(data.size(), -1);
+    
+    for (int currentAlt = 0; currentAlt < data.size(); currentAlt++) {
+        int position = 1;
+
+        float currentAltValue = valuesVec[currentAlt]; 
+        for (int otherAlt = 0; otherAlt < data.size(); otherAlt++) {
+            // no need to check if the other alternative is better if they are the same alternative
+            if (currentAlt == otherAlt)
+                continue;
+            
+            if (currentAlt == 3 && otherAlt == 5) {
+                std::cout << currentAltValue << std::endl;
+                std::cout << valuesVec[otherAlt] << std::endl;
+                std::cout << "<" << (currentAltValue < valuesVec[otherAlt]) << std::endl;
+                std::cout << "==" << (currentAltValue == valuesVec[otherAlt]) << std::endl;
+            }
+
+            if (order == MAX) {
+                if (currentAltValue < valuesVec[otherAlt]) {
+                    position++;
+                }
+            } else if (order == MIN) {
+                if (currentAltValue > valuesVec[otherAlt])
+                    position++;
+            }
+        }
+        returnVec[currentAlt] = position;
+    }
+
+    return returnVec;
+}
+
+/**
  * @brief Print the positive and negative outranking flows for each alternative.
  *
  * The positive flow (φ+) indicates the strength of an alternative in outranking others.
@@ -229,19 +289,27 @@ void Promethee::run()
     std::cout << GREEN << "========== Starting Promethee Algorithm ==========" << RESET << "\n";
 
     // Step 1: Initialize variables
-    std::cout << BLUE << "[Step 1/3]" << RESET << " Initializing variables..." << std::endl;
+    std::cout << BLUE << "[Step 1/4]" << RESET << " Initializing variables..." << std::endl;
     multicriteriaPreferenceMatrix.resize(data.size(), std::vector<float>(data.size(), -1));
     std::cout << GREEN << "✔ Variables initialized successfully." << RESET << "\n";
 
     // Step 2: Process preference matrix
-    std::cout << BLUE << "[Step 2/3]" << RESET << " Calculating the preference matrix..." << std::endl;
+    std::cout << BLUE << "[Step 2/4]" << RESET << " Calculating the preference matrix..." << std::endl;
     calculatePreferenceMatrix();
     std::cout << GREEN << "✔ Preference matrix calculated successfully." << RESET << "\n";
 
     // Step 3: Compute flows
-    std::cout << BLUE << "[Step 3/3]" << RESET << " Computing positive and negative flows..." << std::endl;
+    std::cout << BLUE << "[Step 3/4]" << RESET << " Computing positive and negative flows..." << std::endl;
     calculateFlows();
     std::cout << GREEN << "✔ Flows computed successfully." << RESET << "\n";
+
+    // Step 4: Compute best alternatives
+    std::cout << BLUE << "[Step 4/4]" << RESET << " Computing best alternatives..." << std::endl;
+    bestAlternativesPositive.resize(data.size(), -1);
+    bestAlternativesNegative.resize(data.size(), -1);
+    bestAlternativesOverall.resize(data.size(), -1);
+    calculateBestCandidates();
+    std::cout << GREEN << "✔ Best alternatives computed successfully." << RESET << "\n";
 
     std::cout << GREEN << "========== Promethee Algorithm Completed ==========" << RESET << "\n";
 }

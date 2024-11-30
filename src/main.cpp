@@ -203,22 +203,13 @@ int main(int argc, char **argv)
                     {-94, 96, -700, -3.6, -5, 6},
                 };
 
-
-
                 std::vector<float> weights {
                     0.1, 0.2, 0.2, 0.1, 0.2, 0.2
                 };
 
-                // Promethee pr = Promethee(data, weights);
-                // pr.calculatePreferenceMatrix();
-                // pr.printPreferenceMatrix();
-
-
                 promethee->setData(data);
                 promethee->setWeights(weights);
                 promethee->run();
-                promethee->printPreferenceMatrix();
-                promethee->printFlows();
                 if (outputFile != "")
                 {
                 promethee->save(outputFile);
