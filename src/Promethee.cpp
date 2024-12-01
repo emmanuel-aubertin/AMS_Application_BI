@@ -268,7 +268,20 @@ int Promethee::save(std::string dirPath)
 
     outputFileFlow.close();
 
-    // rajouter les graphes, "kernel"
+    filePath = folderPath / "bestAlternatives.csv";
+    std::ofstream outputFileBestAlternatives(filePath);
+
+    if (!outputFileBestAlternatives) {
+        std::cerr << "Error creating file for writing" << std::endl;
+        return -1;
+    }
+
+    outputFileBestAlternatives << "Flow,Positive Flow,Negative Flow" << "\n";
+    for (size_t i = 0; i < flows.size(); ++i) {
+        outputFileBestAlternatives << bestAlternativesOverall[i] << bestAlternativesPositive[i] << bestAlternativesNegative[i] << "\n";
+    }
+
+    outputFileBestAlternatives.close();
 
     return 1;
 }
