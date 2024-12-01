@@ -129,42 +129,35 @@ void Promethee::calculateFlows()
  * the int at each index represents the position of the alternative at said index. 
  * For example, the vector <5, 2, 3, 4, 1> means that the alternative at index 4 is the best, 0 the worse, and so on.
  */
-void Promethee::calculateBestCandidates() {
-    printFlows();
+void Promethee::calculateBestCandidates() 
+{
     bestAlternativesPositive = calculatePosition(positiveFlow, MAX);
     bestAlternativesNegative = calculatePosition(negativeFlow, MIN);
     bestAlternativesOverall = calculatePosition(flows, MAX);
-
-    for (int val : bestAlternativesPositive) {
-        std::cout << val << " ";
-    } std::cout << std::endl;
-    
-    for (int val : bestAlternativesNegative) {
-        std::cout << val << " ";
-    } std::cout << std::endl;
-    
-    for (int val : bestAlternativesOverall) {
-        std::cout << val << " ";
-    } std::cout << std::endl;
 }
 
-std::vector<int> Promethee::calculatePosition(std::vector<float> valuesVec, OptimizationType order) {
+std::vector<int> Promethee::calculatePosition(std::vector<float> valuesVec, OptimizationType order) 
+{
     std::vector<int> returnVec(data.size(), -1);
     
-    for (int currentAlt = 0; currentAlt < data.size(); currentAlt++) {
+    for (int currentAlt = 0; currentAlt < data.size(); currentAlt++) 
+    {
         int position = 1;
 
         float currentAltValue = valuesVec[currentAlt]; 
-        for (int otherAlt = 0; otherAlt < data.size(); otherAlt++) {
+        for (int otherAlt = 0; otherAlt < data.size(); otherAlt++) 
+        {
             // no need to check if the other alternative is better if they are the same alternative
             if (currentAlt == otherAlt)
                 continue;
 
-            if (order == MAX) {
-                if (currentAltValue < valuesVec[otherAlt]) {
+            if (order == MAX) 
+            {
+                if (currentAltValue < valuesVec[otherAlt])
                     position++;
-                }
-            } else if (order == MIN) {
+            }
+            else if (order == MIN) 
+            {
                 if (currentAltValue > valuesVec[otherAlt])
                     position++;
             }
@@ -186,19 +179,22 @@ void Promethee::printFlows()
     std::cout << "Positive Flow (φ+):\n";
     for (int i = 0; i < positiveFlow.size(); ++i)
     {
-        std::cout << "Alternative " << i + 1 << ": " << std::setw(6) << positiveFlow[i] << "\n";
+        // std::cout << "Alternative " << i + 1 << ": " << std::setw(6) << positiveFlow[i] << "\n";
+        std::cout << "Alternative " << i + 1 << ": " <<  positiveFlow[i] << "\n";
     }
 
     std::cout << "\nNegative Flow (φ−):\n";
     for (int i = 0; i < negativeFlow.size(); ++i)
     {
-        std::cout << "Alternative " << i + 1 << ": " << std::setw(6) << negativeFlow[i] << "\n";
+        // std::cout << "Alternative " << i + 1 << ": " << std::setw(6) << negativeFlow[i] << "\n";
+        std::cout << "Alternative " << i + 1 << ": " <<  negativeFlow[i] << "\n";
     }
 
     std::cout << "\nFlows (φ):\n";
     for (int i = 0; i < flows.size(); ++i)
     {
-        std::cout << "Alternative " << i + 1 << ": " << std::setw(6) << flows[i] << "\n";
+        // std::cout << "Alternative " << i + 1 << ": " << std::setw(6) << flows[i] << "\n";
+        std::cout << "Alternative " << i + 1 << ": " <<  flows[i] << "\n";
     }
 }
 
