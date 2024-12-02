@@ -45,12 +45,10 @@ Electre::Electre(
     std::vector<float> vetos,
     std::vector<float> preferenceThresholds,
     std::vector<OptimizationType> optimizations,
-    float concordanceThreshold) : Electre::Electre(values, weights, vetos, optimizations, concordanceThreshold) 
+    float concordanceThreshold) : Electre::Electre(values, weights, vetos, optimizations, concordanceThreshold)
 {
     this->preferenceThresholds = preferenceThresholds;
 }
-
-
 
 /**
  * @brief Calculates the concordance matrix.
@@ -60,22 +58,28 @@ Electre::Electre(
  */
 void Electre::processConcordance()
 {
-    for (int y = 0; y < nbCandidates - 1; y++)
+    for (int y = 0; y < values.size() - 1; y++)
     {
-        for (int x = y + 1; x < nbCandidates; x++)
+        for (int x = y + 1; x < values.size(); x++)
         {
             float concordVal1 = 0;
             float concordVal2 = 0;
 
-            for (int criterium = 0; criterium < nbCriteria; criterium++)
+            for (int criterium = 0; criterium < weights.size(); criterium++)
             {
                 float candidateVal1 = values[y][criterium];
                 float candidateVal2 = values[x][criterium];
-                float threshold = preferenceThresholds[criterium];
+
+                float threshold = 0;
+                if (!preferenceThresholds.empty())
+                    threshold = preferenceThresholds[criterium];
+
                 float val = weights[criterium];
 
                 double diff = std::abs(candidateVal1 - candidateVal2);
-                double coeff = 1 - std::min(1.0, diff / threshold);
+                double coeff = 0;
+                if (threshold != 0)
+                    coeff = 1 - std::min(1.0, diff / threshold);
 
                 if (candidateVal1 == candidateVal2)
                 {
@@ -118,11 +122,11 @@ void Electre::processConcordance()
 
 void Electre::processNondiscordance()
 {
-    for (int criterium = 0; criterium < nbCriteria; criterium++)
+    for (int criterium = 0; criterium < weights.size(); criterium++)
     {
-        for (int y = 0; y < nbCandidates; y++)
+        for (int y = 0; y < values.size(); y++)
         {
-            for (int x = 0; x < nbCandidates; x++)
+            for (int x = 0; x < values.size(); x++)
             {
                 if (y == x)
                 {
@@ -157,9 +161,9 @@ void Electre::processNondiscordance()
 
 void Electre::processDominance()
 {
-    for (int y = 0; y < nbCandidates; y++)
+    for (int y = 0; y < values.size(); y++)
     {
-        for (int x = 0; x < nbCandidates; x++)
+        for (int x = 0; x < values.size(); x++)
         {
             if (concordance[y][x] < concordanceThreshold)
                 continue;
@@ -179,31 +183,29 @@ void Electre::processKernel()
         deleteCycles(cycles);
 
     // get kernel
-    for (int y = 0; y < nbCandidates; y++)
+    for (int y = 0; y < values.size(); y++)
     {
-        for (int x = 0; x < nbCandidates; x++)
+        for (int x = 0; x < values.size(); x++)
         {
-            // if (!kernel[x])
-            //     continue;
+            if (!kernel[x])
+                continue;
 
             if (!dominance[y][x])
+                continue;
+
+            if (concordance[y][x] < concordanceThreshold)
                 continue;
 
             kernel[x] = false;
         }
     }
-
-    std::cout << "Kernel" << std::endl;
-    for (bool val : kernel)
-        std::cout << val << " ";
-    std::cout << std::endl;
 }
 
 std::vector<std::vector<int>> Electre::getCycles()
 {
     std::vector<std::vector<int>> cycles;
 
-    for (int candidate = 0; candidate < nbCandidates; candidate++)
+    for (int candidate = 0; candidate < values.size(); candidate++)
     {
         std::vector<std::vector<int>> returnedVector = getSuccessorCycles(candidate, std::vector<int>());
 
@@ -250,7 +252,7 @@ std::vector<std::vector<int>> Electre::getSuccessorCycles(int candidate, std::ve
 
     std::vector<std::vector<int>> returnVector{};
 
-    for (int i = 0; i < nbCandidates; i++)
+    for (int i = 0; i < values.size(); i++)
     {
         if (dominance[candidate][i] == 1)
         {
@@ -335,7 +337,6 @@ std::vector<bool> Electre::getKernel()
     return kernel;
 }
 
-
 /**
  * @brief Set the veto thresholds for each criterion.
  *
@@ -353,6 +354,10 @@ void Electre::setVetos(const std::vector<float> &newVetos)
  */
 void Electre::setPreferenceThresholds(const std::vector<float> &newThresholds)
 {
+    if(newThresholds.empty()){
+        preferenceThresholds = std::vector<float>(nbCriteria, 0.0);
+        return;
+    }
     preferenceThresholds = newThresholds;
 }
 
@@ -416,8 +421,74 @@ void Electre::setKernel(const std::vector<bool> &newKernel)
     kernel = newKernel;
 }
 
+void Electre::printVectors()
+{
+    std::cout << "Printing corcordance: " << std::endl;
+    for (std::vector<float> row : concordance) 
+    {
+        for (float val : row) 
+        {
+            std::cout << val << "\t";
+        }
+        std::cout << std::endl;
+    }
+
+    std::cout << "Printing non-discordance: " << std::endl;
+    for (std::vector<bool> row : nonDiscordance) 
+    {
+        for (bool val : row) 
+        {
+            std::cout << val << "\t";
+        }
+        std::cout << std::endl;
+    }
+
+    std::cout << "Printing dominance: " << std::endl;
+    for (std::vector<bool> row : dominance) 
+    {
+        for (bool val : row) 
+        {
+            std::cout << val << "\t";
+        }
+        std::cout << std::endl;
+    }
+    std::cout << "Printing kernel: " << std::endl;
+    for (bool val : kernel) 
+    {
+        std::cout << val << "\t";
+    }
+    std::cout << std::endl;
+}
 
 
+int Electre::save(std::string dirPath)
+{
+    std::filesystem::path folderPath = std::filesystem::path(dirPath) / "Electre";
+
+    if (!std::filesystem::exists(folderPath)) {
+        if (!std::filesystem::create_directories(folderPath)) {
+            std::cerr << "Error creating directory: " << folderPath << std::endl;
+            return -1;
+        }
+    }
+
+
+    std::filesystem::path filePath = folderPath / "kernel.csv";
+    std::ofstream outputFileKernel(filePath);
+
+    if (!outputFileKernel) {
+        std::cerr << "Error creating file for writing" << std::endl;
+        return -1;
+    }
+
+    for (const auto& row : this->kernel) {
+        outputFileKernel << row << ",";
+    }
+
+    outputFileKernel.close();
+
+    return 1;
+}
 
 void Electre::run()
 {
@@ -425,21 +496,25 @@ void Electre::run()
 
     // Step 1: Process concordance matrix
     std::cout << BLUE << "[Step 1/4]" << RESET << " Processing the concordance matrix..." << std::endl;
+    concordance.resize(values.size(), std::vector<float>(values.size(), 0.0));
     processConcordance();
     std::cout << GREEN << "✔ Concordance matrix processed successfully." << RESET << "\n";
 
     // Step 2: Process nondiscordance matrix
     std::cout << BLUE << "[Step 2/4]" << RESET << " Processing the nondiscordance matrix..." << std::endl;
+    nonDiscordance.resize(values.size(), std::vector<bool>(values.size(), true));
     processNondiscordance();
     std::cout << GREEN << "✔ Nondiscordance matrix processed successfully." << RESET << "\n";
 
     // Step 3: Compute dominance relations
     std::cout << BLUE << "[Step 3/4]" << RESET << " Computing dominance relations..." << std::endl;
+    dominance.resize(values.size(), std::vector<bool>(values.size(), false));
     processDominance();
     std::cout << GREEN << "✔ Dominance relations computed successfully." << RESET << "\n";
 
     // Step 4: Identify the kernel
     std::cout << BLUE << "[Step 4/4]" << RESET << " Identifying the kernel (final decision set)..." << std::endl;
+    kernel.resize(values.size(), true);
     processKernel();
     std::cout << GREEN << "✔ Kernel identified successfully." << RESET << "\n";
 

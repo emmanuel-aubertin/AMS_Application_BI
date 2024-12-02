@@ -7,3 +7,5 @@
 *.gch
 
 ams-BI
+
+output/*

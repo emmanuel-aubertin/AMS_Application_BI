@@ -2,10 +2,12 @@
 #include <algorithm>
 #include <memory>
 #include <string.h>
+#include <filesystem>
 #include "../include/Parser.hpp"
 #include "../include/Electre.hpp"
 #include "../include/Promethee.hpp"
 #include "../include/Algo.hpp"
+// #include "../include/OptimizationType.hpp"
 
 // ANSI escape codes for text color
 #define RESET "\033[0m"
@@ -15,7 +17,7 @@
 #define BLUE "\033[34m"
 
 std::string PROGNAME = "ams-BI";
-std::string RELEASE = "Revision 0.1 | Last update 30 Sept 2024";
+std::string RELEASE = "Revision 0.2 | Last update 2 Dec 2024";
 std::string AUTHOR = "\033[1mAubertin Emmanuel, Ange Cure, Jerome Chen\033[0m";
 std::string COPYRIGHT = "(c) 2024 " + AUTHOR + "\nFrom https://github.com/emmanuel-aubertin/AMS_Application_BI";
 bool VERBOSE = false;
@@ -43,16 +45,17 @@ void print_usage(const std::vector<std::unique_ptr<Algo>> &algo)
               << "\033[1mUsage: \033[0m" << PROGNAME << " & [-d | --data] | [-h | --help] | [-v | --version] " << std::endl
               << "          -h | --help                     Help" << std::endl
               << "          -v | --version                  Version" << std::endl
+              << "          -s | --save                     Path to the output file" << std::endl
+              << "          -d | --data                     Path to data CSV file" << std::endl
+              << "          -w | --weight                   Path to weight CSV file" << std::endl
               << "          -a | --algo                     Choose the algorithm that you want to run : " << std::endl;
     for (const auto &a : algo)
     {
         std::cout << "                                              " << a->getArgName() << "       " << a->getDescription() << " (" << a->getAltInfo() << ")" << std::endl;
     }
-    std::cout << "          -d | --data                     Path to data CSV file" << std::endl
-              << "          -w | --weight                   Path to weight CSV file" << std::endl
-              << std::endl
+    std::cout << std::endl
               << "\033[1mExample to run Electre:\033[0m " << std::endl
-              << PROGNAME << " -a e -d data.csv -w weights.csv" << std::endl;
+              << PROGNAME << " -a e -d data/recycle/donnees.csv -w data/recycle/poids.csv" << std::endl;
 };
 
 int main(int argc, char **argv)
@@ -63,9 +66,10 @@ int main(int argc, char **argv)
               << std::endl;
 
     std::vector<std::unique_ptr<Algo>> availableAlgos;
-    availableAlgos.push_back(std::make_unique<Algo>("All", "a", "Run all algorithms", "(by default)"));
     availableAlgos.push_back(std::make_unique<Electre>());
     availableAlgos.push_back(std::make_unique<Promethee>());
+
+    std::string outputFile = "";
 
     std::string filename = "";
     bool isFile = false;
@@ -74,6 +78,18 @@ int main(int argc, char **argv)
     bool isWeightFile = false;
 
     std::string algoToRun = "a";
+
+    std::string preferencesFile = "";
+    bool isPreferencesFile = false;
+
+    std::string vetosFile = "";
+    bool isVetosFile = false;
+
+    std::string optimizationsFile = "";
+    bool isOptimizationsFile = false;
+
+    std::string concordanceThresholdFile = "";
+    bool isConcordanceThresholdFile = false;
 
     // Arg parser
     if (argc < 0)
@@ -93,6 +109,10 @@ int main(int argc, char **argv)
             print_release();
             return 0;
         }
+        else if (!strcmp(argv[i], "-s") || !strcmp(argv[i], "--save"))
+        {
+            outputFile = argv[++i];
+        }
         else if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--data"))
         {
             filename = argv[++i];
@@ -103,17 +123,31 @@ int main(int argc, char **argv)
             filenameWeight = argv[++i];
             isWeightFile = true;
         }
+        else if (!strcmp(argv[i], "-p") || !strcmp(argv[i], "--preferences"))
+        {
+            preferencesFile = argv[++i];
+            isPreferencesFile = true;
+        }
+        else if (!strcmp(argv[i], "-V") || !strcmp(argv[i], "--vetos"))
+        {
+            vetosFile = argv[++i];
+            isVetosFile = true;
+        }
+        else if (!strcmp(argv[i], "-o") || !strcmp(argv[i], "--optimization"))
+        {
+            optimizationsFile = argv[++i];
+            isOptimizationsFile = true;
+        }
+        else if (!strcmp(argv[i], "-ct") || !strcmp(argv[i], "--concordance_threshold"))
+        {
+            concordanceThresholdFile = argv[++i];
+            isConcordanceThresholdFile = true;
+        }
         else if (!strcmp(argv[i], "-a") || !strcmp(argv[i], "--algo"))
         {
             if (++i < argc)
             {
                 algoToRun = argv[i];
-                if (algoToRun.find('a') != std::string::npos)
-                {
-                    warning("Algorithm 'a' (All) overrides all other selections.");
-                    algoToRun = "a";
-                    continue;
-                }
 
                 algoToRun.erase(std::remove_if(algoToRun.begin(), algoToRun.end(),
                                                [&availableAlgos](char c)
@@ -167,7 +201,7 @@ int main(int argc, char **argv)
     }
 
     std::vector<std::vector<float>> data = parser.getParsedFile();
-    std::vector<float> weightsProm = parser.getParsedWeight();
+    std::vector<float> weights = parser.getParsedWeight();
 
     for (const char c : algoToRun)
     {
@@ -178,18 +212,67 @@ int main(int argc, char **argv)
         if (it != availableAlgos.end())
         {
             std::cout << BLUE << "\033[1mExecuting: " << (*it)->getName() << RESET << std::endl;
-            
+
             if (auto *electre = dynamic_cast<Electre *>(it->get()))
             {
+                if (!isVetosFile)
+                {
+                    std::cerr << "You must specify a veto file when using the Electre method." << std::endl; 
+                    continue;
+                }
+                parser.parseVetosFile(vetosFile);
+                std::vector<float> vetos = parser.getParsedVetosFile();
+
+                if (!isOptimizationsFile)
+                {
+                    std::cerr << "You must specify an optimization file when using the Electre method." << std::endl; 
+                    continue;
+                }
+                parser.parseOptimizationsFile(optimizationsFile);
+                std::vector<OptimizationType> optimizations = parser.getParsedOptimizationsFile();
+
+                if (!isConcordanceThresholdFile)
+                {
+                    std::cerr << "You must specify a concordance threshold file when using the Electre method." << std::endl; 
+                    continue;
+                }                
+                parser.parseConcordanceThresholdFile(concordanceThresholdFile);
+                float concordanceThreshold = parser.getParsedConcordanceThresholdFile();
+
+                std::cout << "Data: " << std::endl;
+                for (float val : data[0])
+                    std::cout << val << " ";
+                std::cout << std::endl;
+
+                std::cout << "Number of candidates: " << data.size() << std::endl;
+                std::cout << "Number of criteria: " << data[0].size() << std::endl;
+
                 electre->setData(data);
-                electre->setWeights(weightsProm);
+                electre->setWeights(weights);
+                electre->setVetos(vetos);
+                electre->setConcordanceThreshold(concordanceThreshold);
+                if (isPreferencesFile)
+                {
+                    parser.parsePreferencesFile(preferencesFile);
+                    std::vector<float> preferences = parser.getParsedPreferencesFile();
+                    electre->setPreferenceThresholds(preferences);
+                }
+                electre->setOptimizations(optimizations);
                 electre->run();
+                if (outputFile != "")
+                {
+                    electre->save(outputFile);
+                }
             }
             else if (auto *promethee = dynamic_cast<Promethee *>(it->get()))
             {
                 promethee->setData(data);
-                promethee->setWeights(weightsProm);
+                promethee->setWeights(weights);
                 promethee->run();
+                if (outputFile != "")
+                {
+                promethee->save(outputFile);
+                }
             }
         }
         else
