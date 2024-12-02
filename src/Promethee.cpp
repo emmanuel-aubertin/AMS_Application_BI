@@ -278,7 +278,9 @@ int Promethee::save(std::string dirPath)
 
     outputFileBestAlternatives << "Flow,Positive Flow,Negative Flow" << "\n";
     for (size_t i = 0; i < flows.size(); ++i) {
-        outputFileBestAlternatives << bestAlternativesOverall[i] << bestAlternativesPositive[i] << bestAlternativesNegative[i] << "\n";
+        outputFileBestAlternatives << bestAlternativesOverall[i] << ","
+                                   << bestAlternativesPositive[i] << "," 
+                                   << bestAlternativesNegative[i] << "\n";
     }
 
     outputFileBestAlternatives.close();
