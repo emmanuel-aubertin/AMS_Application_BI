@@ -13,7 +13,7 @@ public:
     std::string getDescription() { return this->description; };
     std::string getAltInfo() { return this->altInfo; };
 
-    void setData(const std::vector<std::vector<float>> &newData) { data = newData; }
+    virtual void setData(const std::vector<std::vector<float>> &newData) { data = newData; }
     void setWeights(const std::vector<float> &newWeights) { weights = newWeights; }
 
     explicit Algo(const std::string &name, const std::string &argName, const std::string &description, const std::string &altInfo)

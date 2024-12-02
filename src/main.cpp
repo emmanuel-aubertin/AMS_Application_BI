@@ -184,8 +184,31 @@ int main(int argc, char **argv)
 
             if (auto *electre = dynamic_cast<Electre *>(it->get()))
             {
+                std::vector<std::vector<float>> data {
+                    {80, 90, 600, 5.4, 8, 5},
+                    {65, 58, 200, 9.7, 1, 1},
+                    {83, 60, 400, 7.2, 4, 7},
+                    {40, 80, 1000, 7.5, 7, 10},
+                    {52, 72, 600, 2.0, 3, 8},
+                    {94, 96, 700, 3.6, 5, 6},
+                };
+
+                std::vector<float> weights {
+                    0.1, 0.2, 0.2, 0.1, 0.2, 0.2
+                };
+
+                std::vector<float> vetos {45, 29, 550, 6, 4.5, 4.5};
+                std::vector<float> preferenceThresholds {20, 10, 200, 4, 2, 2};
+                std::vector<OptimizationType> optimizations {MIN, MAX, MIN, MIN, MIN, MAX};
+                
+                // float concordanceThreshold) 
+
                 electre->setData(data);
                 electre->setWeights(weights);
+                electre->setVetos(vetos);
+                // si sans preference, mettre à 0
+                // electre->setPreferenceThresholds(preferenceThresholds);
+                electre->setOptimizations(optimizations);
                 electre->run();
                 if (outputFile != "")
                 {
@@ -194,19 +217,6 @@ int main(int argc, char **argv)
             }
             else if (auto *promethee = dynamic_cast<Promethee *>(it->get()))
             {
-                std::vector<std::vector<float>> data {
-                    {-80, 90, -600, -5.4, -8, 5},
-                    {-65, 58, -200, -9.7, -1, 1},
-                    {-83, 60, -400, -7.2, -4, 7},
-                    {-40, 80, -1000, -7.5, -7, 10},
-                    {-52, 72, -600, -2.0, -3, 8},
-                    {-94, 96, -700, -3.6, -5, 6},
-                };
-
-                std::vector<float> weights {
-                    0.1, 0.2, 0.2, 0.1, 0.2, 0.2
-                };
-
                 promethee->setData(data);
                 promethee->setWeights(weights);
                 promethee->run();
