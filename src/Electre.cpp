@@ -114,12 +114,6 @@ void Electre::processConcordance()
             concordance[x][y] = concordVal2;
         }
     }
-
-    for (std::vector<float> row : concordance) {
-        for (float val : row) {
-            std::cout << val << " ";
-        } std::cout << std::endl;
-    }
 }
 
 void Electre::processNondiscordance()
@@ -189,20 +183,18 @@ void Electre::processKernel()
     {
         for (int x = 0; x < values.size(); x++)
         {
-            // if (!kernel[x])
-            //     continue;
+            if (!kernel[x])
+                continue;
 
             if (!dominance[y][x])
+                continue;
+
+            if (concordance[y][x] < concordanceThreshold)
                 continue;
 
             kernel[x] = false;
         }
     }
-
-    std::cout << "Kernel" << std::endl;
-    for (bool val : kernel)
-        std::cout << val << " ";
-    std::cout << std::endl;
 }
 
 std::vector<std::vector<int>> Electre::getCycles()
@@ -496,28 +488,7 @@ int Electre::save(std::string dirPath)
 
 void Electre::run()
 {
-
-    std::cout << "nbCriteria : " << this->nbCriteria << std::endl;
-    preferenceThresholds = std::vector<float>(nbCriteria, 0.0);
-
     std::cout << GREEN << "========== Starting Electre Algorithm ==========" << RESET << "\n";
-
-    std::cout << "Values: " << std::endl;
-    for (std::vector<float> row : values) {
-        for (float val : row) {
-            std::cout << val << " ";
-        } std::cout << std::endl;
-    }
-
-    std::cout << "Weights: " << std::endl;
-    for (float val : weights) {
-        std::cout << val << " ";
-    } std::cout << std::endl;
-
-    std::cout << "Preference Thresholds: " << std::endl;
-    for (float val : preferenceThresholds) {
-        std::cout << val << " ";
-    } std::cout << std::endl;
 
     // Step 1: Process concordance matrix
     std::cout << BLUE << "[Step 1/4]" << RESET << " Processing the concordance matrix..." << std::endl;

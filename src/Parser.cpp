@@ -88,6 +88,8 @@ void Parser::parseWeightFile(const std::string &filename)
     this->parsedWeightFile = result[0];
 }
 
+
+
 /**
  * @brief Prints the parsed data to the console.
  *
