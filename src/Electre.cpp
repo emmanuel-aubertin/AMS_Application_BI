@@ -358,6 +358,10 @@ void Electre::setVetos(const std::vector<float> &newVetos)
  */
 void Electre::setPreferenceThresholds(const std::vector<float> &newThresholds)
 {
+    if(newThresholds.empty()){
+        preferenceThresholds = std::vector<float>(nbCriteria, 0.0);
+        return;
+    }
     preferenceThresholds = newThresholds;
 }
 
@@ -492,6 +496,10 @@ int Electre::save(std::string dirPath)
 
 void Electre::run()
 {
+
+    std::cout << "nbCriteria : " << this->nbCriteria << std::endl;
+    preferenceThresholds = std::vector<float>(nbCriteria, 0.0);
+
     std::cout << GREEN << "========== Starting Electre Algorithm ==========" << RESET << "\n";
 
     std::cout << "Values: " << std::endl;

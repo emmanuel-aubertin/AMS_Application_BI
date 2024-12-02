@@ -14,7 +14,7 @@ public:
     std::string getAltInfo() { return this->altInfo; };
 
     virtual void setData(const std::vector<std::vector<float>> &newData) { data = newData; }
-    void setWeights(const std::vector<float> &newWeights) { weights = newWeights; }
+    virtual void setWeights(const std::vector<float> &newWeights) { weights = newWeights; }
 
     explicit Algo(const std::string &name, const std::string &argName, const std::string &description, const std::string &altInfo)
         : name(name), argName(argName), description(description), altInfo(altInfo) {}

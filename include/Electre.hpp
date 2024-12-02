@@ -55,7 +55,8 @@ public:
     Electre() : Algo("Electre", "e", "For Electre algo", "in development") {};
 
     // Setters
-    void setData(const std::vector<std::vector<float>> &newData) override { values = newData; }
+    void setData(const std::vector<std::vector<float>> &newData) override { values = newData; nbCandidates = values.size();}
+    void setWeights(const std::vector<float> &newWeights) override { weights = newWeights;  nbCriteria = weights.size();}
     void setVetos(const std::vector<float> &newVetos);
     void setPreferenceThresholds(const std::vector<float> &newThresholds);
     void setOptimizations(const std::vector<OptimizationType> &newOptimizations);

@@ -207,7 +207,7 @@ int main(int argc, char **argv)
                 electre->setWeights(weights);
                 electre->setVetos(vetos);
                 // si sans preference, mettre à 0
-                // electre->setPreferenceThresholds(preferenceThresholds);
+                electre->setPreferenceThresholds(preferenceThresholds);
                 electre->setOptimizations(optimizations);
                 electre->run();
                 if (outputFile != "")
