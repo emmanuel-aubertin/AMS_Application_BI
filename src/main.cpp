@@ -7,6 +7,7 @@
 #include "../include/Electre.hpp"
 #include "../include/Promethee.hpp"
 #include "../include/Algo.hpp"
+// #include "../include/OptimizationType.hpp"
 
 // ANSI escape codes for text color
 #define RESET "\033[0m"
@@ -16,7 +17,7 @@
 #define BLUE "\033[34m"
 
 std::string PROGNAME = "ams-BI";
-std::string RELEASE = "Revision 0.1 | Last update 22 Nov 2024";
+std::string RELEASE = "Revision 0.2 | Last update 2 Dec 2024";
 std::string AUTHOR = "\033[1mAubertin Emmanuel, Ange Cure, Jerome Chen\033[0m";
 std::string COPYRIGHT = "(c) 2024 " + AUTHOR + "\nFrom https://github.com/emmanuel-aubertin/AMS_Application_BI";
 bool VERBOSE = false;
@@ -78,7 +79,17 @@ int main(int argc, char **argv)
 
     std::string algoToRun = "a";
 
-    std::string extension = "";
+    std::string preferencesFile = "";
+    bool isPreferencesFile = false;
+
+    std::string vetosFile = "";
+    bool isVetosFile = false;
+
+    std::string optimizationsFile = "";
+    bool isOptimizationsFile = false;
+
+    std::string concordanceThresholdFile = "";
+    bool isConcordanceThresholdFile = false;
 
     // Arg parser
     if (argc < 0)
@@ -111,6 +122,26 @@ int main(int argc, char **argv)
         {
             filenameWeight = argv[++i];
             isWeightFile = true;
+        }
+        else if (!strcmp(argv[i], "-p") || !strcmp(argv[i], "--preferences"))
+        {
+            preferencesFile = argv[++i];
+            isPreferencesFile = true;
+        }
+        else if (!strcmp(argv[i], "-V") || !strcmp(argv[i], "--vetos"))
+        {
+            vetosFile = argv[++i];
+            isVetosFile = true;
+        }
+        else if (!strcmp(argv[i], "-o") || !strcmp(argv[i], "--optimization"))
+        {
+            optimizationsFile = argv[++i];
+            isOptimizationsFile = true;
+        }
+        else if (!strcmp(argv[i], "-ct") || !strcmp(argv[i], "--concordance_threshold"))
+        {
+            concordanceThresholdFile = argv[++i];
+            isConcordanceThresholdFile = true;
         }
         else if (!strcmp(argv[i], "-a") || !strcmp(argv[i], "--algo"))
         {
@@ -184,19 +215,48 @@ int main(int argc, char **argv)
 
             if (auto *electre = dynamic_cast<Electre *>(it->get()))
             {
-                float concordanceThreshold = 0.6;
-                std::vector<float> vetos {45, 29, 550, 6, 4.5, 4.5};
-                std::vector<float> preferenceThresholds {20, 10, 200, 4, 2, 2};
-                std::vector<OptimizationType> optimizations {MIN, MAX, MIN, MIN, MIN, MAX};
-                
-                // float concordanceThreshold) 
+                if (!isVetosFile)
+                {
+                    std::cerr << "You must specify a veto file when using the Electre method." << std::endl; 
+                    continue;
+                }
+                parser.parseVetosFile(vetosFile);
+                std::vector<float> vetos = parser.getParsedVetosFile();
+
+                if (!isOptimizationsFile)
+                {
+                    std::cerr << "You must specify an optimization file when using the Electre method." << std::endl; 
+                    continue;
+                }
+                parser.parseOptimizationsFile(optimizationsFile);
+                std::vector<OptimizationType> optimizations = parser.getParsedOptimizationsFile();
+
+                if (!isConcordanceThresholdFile)
+                {
+                    std::cerr << "You must specify a concordance threshold file when using the Electre method." << std::endl; 
+                    continue;
+                }                
+                parser.parseConcordanceThresholdFile(concordanceThresholdFile);
+                float concordanceThreshold = parser.getParsedConcordanceThresholdFile();
+
+                std::cout << "Data: " << std::endl;
+                for (float val : data[0])
+                    std::cout << val << " ";
+                std::cout << std::endl;
+
+                std::cout << "Number of candidates: " << data.size() << std::endl;
+                std::cout << "Number of criteria: " << data[0].size() << std::endl;
 
                 electre->setData(data);
                 electre->setWeights(weights);
                 electre->setVetos(vetos);
                 electre->setConcordanceThreshold(concordanceThreshold);
-                // si sans preference, mettre à 0
-                electre->setPreferenceThresholds(preferenceThresholds);
+                if (isPreferencesFile)
+                {
+                    parser.parsePreferencesFile(preferencesFile);
+                    std::vector<float> preferences = parser.getParsedPreferencesFile();
+                    electre->setPreferenceThresholds(preferences);
+                }
                 electre->setOptimizations(optimizations);
                 electre->run();
                 if (outputFile != "")

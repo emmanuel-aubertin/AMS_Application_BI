@@ -69,7 +69,11 @@ void Electre::processConcordance()
             {
                 float candidateVal1 = values[y][criterium];
                 float candidateVal2 = values[x][criterium];
-                float threshold = preferenceThresholds[criterium];
+
+                float threshold = 0;
+                if (!preferenceThresholds.empty())
+                    threshold = preferenceThresholds[criterium];
+
                 float val = weights[criterium];
 
                 double diff = std::abs(candidateVal1 - candidateVal2);
@@ -478,7 +482,7 @@ int Electre::save(std::string dirPath)
     }
 
     for (const auto& row : this->kernel) {
-        outputFileKernel << row << "/n";
+        outputFileKernel << row << ",";
     }
 
     outputFileKernel.close();
@@ -513,8 +517,6 @@ void Electre::run()
     kernel.resize(values.size(), true);
     processKernel();
     std::cout << GREEN << "✔ Kernel identified successfully." << RESET << "\n";
-
-    printVectors();
 
     std::cout << GREEN << "========== Electre Algorithm Completed ==========" << RESET << "\n";
 }
