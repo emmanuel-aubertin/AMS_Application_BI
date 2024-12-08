@@ -108,6 +108,13 @@ void Parser::parseWeightFile(const std::string &filename)
         }
         file.close();
     }
+    float total_weight = 0;
+    for(int i = 0; i < result[0].size(); i++) {
+        total_weight += result[0][i];
+    }
+    for(int i = 0; i < result[0].size(); i++) {
+        result[0][i] = result[0][i] / total_weight;
+    }
     this->parsedWeightFile = result[0];
 }
 
