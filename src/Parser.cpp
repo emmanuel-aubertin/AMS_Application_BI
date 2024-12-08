@@ -72,27 +72,20 @@ void Parser::parseFile(const std::string &filename)
     std::vector<std::vector<float>> result;
     std::string line;
     std::ifstream file(filename);
-    int j = 0;
     if (file.is_open())
     {
-        std::cout << "Reading line " << j << std::endl;
+        bool first = true;
         while (std::getline(file, line))
         {
-            int i = 0;
             std::vector<float> tempVector = split(line);
-            if (!j)
-            {
-                std::cout << "result need to be initialized" << std::endl;
-                for(auto col : tempVector){
-                    result.push_back({tempVector[i++]});
+            for (int i = 0; i <  tempVector.size(); i++) {
+                if (first) {
+                    std::vector<float> toto;
+                    result.push_back(toto);
                 }
-                j++;
-                continue;
+                result[i].push_back(tempVector[i]);
             }
-            for (auto &col : tempVector)
-            {
-                result[0].push_back(tempVector[i++]);
-            }
+            first = false;
         }
         file.close();
     }
