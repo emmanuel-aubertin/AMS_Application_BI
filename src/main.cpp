@@ -1,3 +1,14 @@
+#include <iostream>
+#include <algorithm>
+#include <memory>
+#include <string.h>
+#include <filesystem>
+#include "../include/Parser.hpp"
+#include "../include/Electre.hpp"
+#include "../include/Promethee.hpp"
+#include "../include/Algo.hpp"
+// #include "../include/OptimizationType.hpp"
+
 // ANSI escape codes for text color
 #define RESET "\033[0m"
 #define RED "\033[31m"
@@ -5,16 +16,8 @@
 #define YELLOW "\033[33m"
 #define BLUE "\033[34m"
 
-#include <iostream>
-#include <algorithm>
-#include <string.h>
-#include "../include/Parser.hpp"
-#include "../include/Electre.hpp"
-#include "../include/Promethee.hpp"
-#include "../include/Algo.hpp"
-
 std::string PROGNAME = "ams-BI";
-std::string RELEASE = "Revision 0.1 | Last update 30 Sept 2024";
+std::string RELEASE = "Revision 0.2 | Last update 2 Dec 2024";
 std::string AUTHOR = "\033[1mAubertin Emmanuel, Ange Cure, Jerome Chen\033[0m";
 std::string COPYRIGHT = "(c) 2024 " + AUTHOR + "\nFrom https://github.com/emmanuel-aubertin/AMS_Application_BI";
 bool VERBOSE = false;
@@ -35,23 +38,24 @@ auto warning = [](std::string_view message)
     std::cerr << "⚠️ Warning: " << message << " ⚠️\n";
 };
 
-void print_usage(std::vector<Algo> &algo)
+void print_usage(const std::vector<std::unique_ptr<Algo>> &algo)
 {
     std::cout << std::endl
               << PROGNAME << " by " << AUTHOR << std::endl
               << "\033[1mUsage: \033[0m" << PROGNAME << " & [-d | --data] | [-h | --help] | [-v | --version] " << std::endl
               << "          -h | --help                     Help" << std::endl
               << "          -v | --version                  Version" << std::endl
-              << "          -a | --algo                     Choose the algorithm that you want to run : " << std::endl;
-    for (Algo a : algo)
-    {
-        std::cout << "                                              " << a.getArgName() << "       " << a.getDescription() << " (" << a.getAltInfo() << ")" << std::endl;
-    }
-    std::cout << "          -d | --data                     Path to data CSV file" << std::endl
+              << "          -s | --save                     Path to the output file" << std::endl
+              << "          -d | --data                     Path to data CSV file" << std::endl
               << "          -w | --weight                   Path to weight CSV file" << std::endl
-              << std::endl
+              << "          -a | --algo                     Choose the algorithm that you want to run : " << std::endl;
+    for (const auto &a : algo)
+    {
+        std::cout << "                                              " << a->getArgName() << "       " << a->getDescription() << " (" << a->getAltInfo() << ")" << std::endl;
+    }
+    std::cout << std::endl
               << "\033[1mExample to run Electre:\033[0m " << std::endl
-              << PROGNAME << " -a e -d data.csv -w weights.csv" << std::endl;
+              << PROGNAME << " -a e -d data/recycle/donnees.csv -w data/recycle/poids.csv" << std::endl;
 };
 
 int main(int argc, char **argv)
@@ -61,10 +65,11 @@ int main(int argc, char **argv)
     std::cout << std::endl
               << std::endl;
 
-    std::vector<Algo> availableAlgos = {
-          Electre(),
-          Promethee(),
-        };
+    std::vector<std::unique_ptr<Algo>> availableAlgos;
+    availableAlgos.push_back(std::make_unique<Electre>());
+    availableAlgos.push_back(std::make_unique<Promethee>());
+
+    std::string outputFile = "";
 
     std::string filename = "";
     bool isFile = false;
@@ -74,21 +79,39 @@ int main(int argc, char **argv)
 
     std::string algoToRun = "a";
 
+    std::string preferencesFile = "";
+    bool isPreferencesFile = false;
+
+    std::string vetosFile = "";
+    bool isVetosFile = false;
+
+    std::string optimizationsFile = "";
+    bool isOptimizationsFile = false;
+
+    std::string concordanceThresholdFile = "";
+    bool isConcordanceThresholdFile = false;
+
     // Arg parser
-    if (argc < 0) // number of arg minimum
+    if (argc < 0)
+    {
         failure("One argument required. \n\t-h for help");
+    }
 
     for (int i = 1; i < argc; i++)
     {
         if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help"))
         {
             print_usage(availableAlgos);
-            exit(0);
+            return 0;
         }
         else if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--version"))
         {
             print_release();
-            exit(0);
+            return 0;
+        }
+        else if (!strcmp(argv[i], "-s") || !strcmp(argv[i], "--save"))
+        {
+            outputFile = argv[++i];
         }
         else if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--data"))
         {
@@ -100,24 +123,38 @@ int main(int argc, char **argv)
             filenameWeight = argv[++i];
             isWeightFile = true;
         }
+        else if (!strcmp(argv[i], "-p") || !strcmp(argv[i], "--preferences"))
+        {
+            preferencesFile = argv[++i];
+            isPreferencesFile = true;
+        }
+        else if (!strcmp(argv[i], "-V") || !strcmp(argv[i], "--vetos"))
+        {
+            vetosFile = argv[++i];
+            isVetosFile = true;
+        }
+        else if (!strcmp(argv[i], "-o") || !strcmp(argv[i], "--optimization"))
+        {
+            optimizationsFile = argv[++i];
+            isOptimizationsFile = true;
+        }
+        else if (!strcmp(argv[i], "-ct") || !strcmp(argv[i], "--concordance_threshold"))
+        {
+            concordanceThresholdFile = argv[++i];
+            isConcordanceThresholdFile = true;
+        }
         else if (!strcmp(argv[i], "-a") || !strcmp(argv[i], "--algo"))
         {
             if (++i < argc)
             {
                 algoToRun = argv[i];
-                if (algoToRun.find('a') != std::string::npos)
-                {
-                    warning("Algorithm 'a' (All) overrides all other selections.");
-                    algoToRun = "a";
-                    continue;
-                }
 
                 algoToRun.erase(std::remove_if(algoToRun.begin(), algoToRun.end(),
                                                [&availableAlgos](char c)
                                                {
                                                    bool isValid = std::any_of(availableAlgos.begin(), availableAlgos.end(),
-                                                                              [c](Algo &a)
-                                                                              { return a.getArgName() == std::string(1, c); });
+                                                                              [c](const std::unique_ptr<Algo> &a)
+                                                                              { return a->getArgName() == std::string(1, c); });
                                                    if (!isValid)
                                                    {
                                                        warning(std::string(1, c) + " is not a valid algorithm");
@@ -129,26 +166,30 @@ int main(int argc, char **argv)
                 if (algoToRun.empty())
                 {
                     failure("No valid algorithm choices provided.");
-                    exit(1);
+                    return 1;
                 }
             }
             else
             {
                 warning("Missing algorithm name after -a or --algo argument.");
-                std::cout << "Running all algorithm: " << std::endl;
+                std::cout << "Running all algorithms." << std::endl;
                 algoToRun = "a";
             }
         }
-
         else
-        { // ALL OTHER ARGUMENT
+        {
             print_usage(availableAlgos);
-            std::string arg = argv[i];
-            failure("Unknow argument : " + arg);
+            failure("Unknown argument: " + std::string(argv[i]));
+            return 1;
         }
     }
-    // Test parser
-    Parser parser = Parser();
+
+    Parser parser;
+    if (!isFile && !isWeightFile)
+    {
+        failure("You must specify a dataset file and/or weight file.");
+        return 1;
+    }
 
     if (isFile)
     {
@@ -159,7 +200,86 @@ int main(int argc, char **argv)
         parser.parseWeightFile(filenameWeight);
     }
 
-    
+    std::vector<std::vector<float>> data = parser.getParsedFile();
+    std::vector<float> weights = parser.getParsedWeight();
+
+    for (const char c : algoToRun)
+    {
+        auto it = std::find_if(availableAlgos.begin(), availableAlgos.end(),
+                               [c](const std::unique_ptr<Algo> &algo)
+                               { return algo->getArgName() == std::string(1, c); });
+
+        if (it != availableAlgos.end())
+        {
+            std::cout << BLUE << "\033[1mExecuting: " << (*it)->getName() << RESET << std::endl;
+
+            if (auto *electre = dynamic_cast<Electre *>(it->get()))
+            {
+                if (!isVetosFile)
+                {
+                    std::cerr << "You must specify a veto file when using the Electre method." << std::endl; 
+                    continue;
+                }
+                parser.parseVetosFile(vetosFile);
+                std::vector<float> vetos = parser.getParsedVetosFile();
+
+                if (!isOptimizationsFile)
+                {
+                    std::cerr << "You must specify an optimization file when using the Electre method." << std::endl; 
+                    continue;
+                }
+                parser.parseOptimizationsFile(optimizationsFile);
+                std::vector<OptimizationType> optimizations = parser.getParsedOptimizationsFile();
+
+                if (!isConcordanceThresholdFile)
+                {
+                    std::cerr << "You must specify a concordance threshold file when using the Electre method." << std::endl; 
+                    continue;
+                }                
+                parser.parseConcordanceThresholdFile(concordanceThresholdFile);
+                float concordanceThreshold = parser.getParsedConcordanceThresholdFile();
+
+                std::cout << "Data: " << std::endl;
+                for (float val : data[0])
+                    std::cout << val << " ";
+                std::cout << std::endl;
+
+                std::cout << "Number of candidates: " << data.size() << std::endl;
+                std::cout << "Number of criteria: " << data[0].size() << std::endl;
+
+                electre->setData(data);
+                electre->setWeights(weights);
+                electre->setVetos(vetos);
+                electre->setConcordanceThreshold(concordanceThreshold);
+                if (isPreferencesFile)
+                {
+                    parser.parsePreferencesFile(preferencesFile);
+                    std::vector<float> preferences = parser.getParsedPreferencesFile();
+                    electre->setPreferenceThresholds(preferences);
+                }
+                electre->setOptimizations(optimizations);
+                electre->run();
+                if (outputFile != "")
+                {
+                    electre->save(outputFile);
+                }
+            }
+            else if (auto *promethee = dynamic_cast<Promethee *>(it->get()))
+            {
+                promethee->setData(data);
+                promethee->setWeights(weights);
+                promethee->run();
+                if (outputFile != "")
+                {
+                promethee->save(outputFile);
+                }
+            }
+        }
+        else
+        {
+            warning("No matching algorithm found for '" + std::string(1, c) + "'.");
+        }
+    }
 
     return 0;
 }
