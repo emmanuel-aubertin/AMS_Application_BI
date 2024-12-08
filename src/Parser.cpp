@@ -188,6 +188,32 @@ void Parser::parseConcordanceThresholdFile(const std::string &filename)
     this->parsedConcordanceThresholdFile = result[0];
 }
 
+void Parser::parseThemeFile(const std::string &filename) 
+{
+    std::map<int, std::map<std::string, std::array<int, 2>>> result;
+    std::string line;
+    std::ifstream file(filename);
+    if (!file.is_open())
+    {
+        std::cerr << "Error: " << filename << std::endl;
+    }
+    
+    int startIndex = -1;
+    int endIndex = -1;
+    int index = -1;
+
+    while (std::getline(file, line))
+    {
+        // index++ when "catName"
+        // startIndex = ++index when "themeName" : [
+        // endIndex = index when ],
+        // construct a map themeName: startIndex, endIndex
+    }
+    file.close();
+
+    this->parsedThemeFile = result;
+}
+
 
 /**
  * @brief Prints the parsed data to the console.
@@ -244,4 +270,9 @@ std::vector<OptimizationType> Parser::getParsedOptimizationsFile()
 float Parser::getParsedConcordanceThresholdFile() 
 {
     return parsedConcordanceThresholdFile;
+}
+
+std::map<int, std::map<std::string, std::array<int, 2>>> Parser::getParsedThemeFile() 
+{
+    return parsedThemeFile;
 }

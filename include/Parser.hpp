@@ -3,6 +3,8 @@
 
 #include <string>
 #include <vector>
+#include <map>
+#include <array>
 #include "OptimizationType.hpp"
 
 class Parser
@@ -18,6 +20,7 @@ public:
     void parsePreferencesFile(const std::string &filename);
     void parseOptimizationsFile(const std::string &filename);
     void parseConcordanceThresholdFile(const std::string &filename);
+    void parseThemeFile(const std::string &filename);
 
     void print() const;
     std::vector<std::vector<float>> getParsedFile();
@@ -26,6 +29,7 @@ public:
     std::vector<float> getParsedPreferencesFile();
     std::vector<OptimizationType> getParsedOptimizationsFile();
     float getParsedConcordanceThresholdFile();
+    std::map<int, std::map<std::string, std::array<int, 2>>> getParsedThemeFile();
 
 private:
     char m_delimiter;
@@ -35,6 +39,7 @@ private:
     std::vector<float> parsedPreferencesFile;
     std::vector<OptimizationType> parsedOptimizationsFile;
     float parsedConcordanceThresholdFile;
+    std::map<int, std::map<std::string, std::array<int, 2>>> parsedThemeFile;
 };
 
 #endif // PARSER_H

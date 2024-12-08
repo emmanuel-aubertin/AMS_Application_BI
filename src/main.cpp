@@ -91,6 +91,9 @@ int main(int argc, char **argv)
     std::string concordanceThresholdFile = "";
     bool isConcordanceThresholdFile = false;
 
+    std::string themeFile = "";
+    bool isThemeFile = false;
+
     // Arg parser
     if (argc < 0)
     {
@@ -142,6 +145,11 @@ int main(int argc, char **argv)
         {
             concordanceThresholdFile = argv[++i];
             isConcordanceThresholdFile = true;
+        }
+        else if (!strcmp(argv[i], "-tf") || !strcmp(argv[i], "--theme_file"))
+        {
+            themeFile = argv[++i];
+            isThemeFile = true;
         }
         else if (!strcmp(argv[i], "-a") || !strcmp(argv[i], "--algo"))
         {
@@ -202,6 +210,38 @@ int main(int argc, char **argv)
 
     std::vector<std::vector<float>> data = parser.getParsedFile();
     std::vector<float> weights = parser.getParsedWeight();
+    
+    int themes;
+    if (isThemeFile) {
+        parser.parseThemeFile(themeFile);
+        std::map<int, std::map<std::string, std::array<int, 2>>> parsedThemeFile = parser.getParsedThemeFile();
+        
+        std::cout << "A theme file was specified, on which would you like to run the algorithms on? (all, number): ";
+        for (int i=0; i<parsedThemeFile.size(); i++) 
+        {
+            // print the theme at i like this:
+            // i, themeName: startIndex, endIndex
+            // ex: 
+            /*
+                0, Geologie: 0, 2
+                1, Hydrogéologie: 3, 5
+            */
+        }
+
+        // if a specific theme is given, cut data and weights to fit the indexes
+        std::cin >> themes;
+        std::cout << std::endl;
+        // check if the input index is within 0 and parsedThemeFile.size()
+        while (themes < 0 || themes > parsedThemeFile.size()) {
+            std::cout << "The given index is out of range, please specify again: ";
+            std::cin >> themes;
+            std::cout << std::endl;
+        }
+
+        // cut data and weights here
+
+
+    }
 
     for (const char c : algoToRun)
     {
