@@ -178,9 +178,9 @@ void Electre::processDominance()
 
 void Electre::processKernel()
 {
-    // std::vector<std::vector<int>> cycles = getCycles();
-    // if (cycles.size() != 0)
-    //     deleteCycles(cycles);
+    std::vector<std::vector<int>> cycles = getCycles();
+    if (cycles.size() != 0)
+        deleteCycles(cycles);
 
     // get kernel
     for (int y = 0; y < values.size(); y++)
