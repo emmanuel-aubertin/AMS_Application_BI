@@ -251,7 +251,6 @@ int main(int argc, char **argv)
                 }
                 electre->setOptimizations(optimizations);
                 electre->run();
-                electre->printVectors();
                 if (outputFile != "")
                 {
                     electre->save(outputFile);
