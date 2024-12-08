@@ -239,14 +239,6 @@ int main(int argc, char **argv)
                 parser.parseConcordanceThresholdFile(concordanceThresholdFile);
                 float concordanceThreshold = parser.getParsedConcordanceThresholdFile();
 
-                std::cout << "Data: " << std::endl;
-                for (float val : data[0])
-                    std::cout << val << " ";
-                std::cout << std::endl;
-
-                std::cout << "Number of candidates: " << data.size() << std::endl;
-                std::cout << "Number of criteria: " << data[0].size() << std::endl;
-
                 electre->setData(data);
                 electre->setWeights(weights);
                 electre->setVetos(vetos);

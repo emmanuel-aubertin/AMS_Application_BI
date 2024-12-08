@@ -40,7 +40,7 @@ std::vector<OptimizationType> Parser::splitOptimization(const std::string &s)
     std::istringstream tokenStream(s);
     while (std::getline(tokenStream, token, m_delimiter))
     {
-        if (token == "MIN") 
+        if (token == "MIN")
         {
             tokens.push_back(MIN);
         }
@@ -67,14 +67,25 @@ std::vector<OptimizationType> Parser::splitOptimization(const std::string &s)
  */
 void Parser::parseFile(const std::string &filename)
 {
+    std::cout << "Parsed Starting" << std::endl;
+
     std::vector<std::vector<float>> result;
     std::string line;
     std::ifstream file(filename);
     if (file.is_open())
     {
+        bool first = true;
         while (std::getline(file, line))
         {
-            result.push_back(split(line));
+            std::vector<float> tempVector = split(line);
+            for (int i = 0; i <  tempVector.size(); i++) {
+                if (first) {
+                    std::vector<float> toto;
+                    result.push_back(toto);
+                }
+                result[i].push_back(tempVector[i]);
+            }
+            first = false;
         }
         file.close();
     }
@@ -82,6 +93,7 @@ void Parser::parseFile(const std::string &filename)
     {
         std::cerr << "Error: " << filename << std::endl;
     }
+    std::cout << "Data Parsed" << std::endl;
 
     this->parsedFile = result;
 }
@@ -108,11 +120,17 @@ void Parser::parseWeightFile(const std::string &filename)
         }
         file.close();
     }
+    float total_weight = 0;
+    for(int i = 0; i < result[0].size(); i++) {
+        total_weight += result[0][i];
+    }
+    for(int i = 0; i < result[0].size(); i++) {
+        result[0][i] = result[0][i] / total_weight;
+    }
     this->parsedWeightFile = result[0];
 }
 
-
-void Parser::parseVetosFile(const std::string &filename) 
+void Parser::parseVetosFile(const std::string &filename)
 {
     std::vector<std::vector<float>> result;
     std::string line;
@@ -121,7 +139,7 @@ void Parser::parseVetosFile(const std::string &filename)
     {
         std::cerr << "Error: " << filename << std::endl;
     }
-    
+
     while (std::getline(file, line))
     {
         result.push_back(split(line));
@@ -131,7 +149,7 @@ void Parser::parseVetosFile(const std::string &filename)
     this->parsedVetosFile = result[0];
 }
 
-void Parser::parsePreferencesFile(const std::string &filename) 
+void Parser::parsePreferencesFile(const std::string &filename)
 {
     std::vector<std::vector<float>> result;
     std::string line;
@@ -140,7 +158,7 @@ void Parser::parsePreferencesFile(const std::string &filename)
     {
         std::cerr << "Error: " << filename << std::endl;
     }
-    
+
     while (std::getline(file, line))
     {
         result.push_back(split(line));
@@ -150,7 +168,7 @@ void Parser::parsePreferencesFile(const std::string &filename)
     this->parsedPreferencesFile = result[0];
 }
 
-void Parser::parseOptimizationsFile(const std::string &filename) 
+void Parser::parseOptimizationsFile(const std::string &filename)
 {
     std::vector<std::vector<OptimizationType>> result;
     std::string line;
@@ -159,7 +177,7 @@ void Parser::parseOptimizationsFile(const std::string &filename)
     {
         std::cerr << "Error: " << filename << std::endl;
     }
-    
+
     while (std::getline(file, line))
     {
         result.push_back(splitOptimization(line));
@@ -169,7 +187,7 @@ void Parser::parseOptimizationsFile(const std::string &filename)
     this->parsedOptimizationsFile = result[0];
 }
 
-void Parser::parseConcordanceThresholdFile(const std::string &filename) 
+void Parser::parseConcordanceThresholdFile(const std::string &filename)
 {
     std::vector<float> result;
     std::string line;
@@ -178,7 +196,7 @@ void Parser::parseConcordanceThresholdFile(const std::string &filename)
     {
         std::cerr << "Error: " << filename << std::endl;
     }
-    
+
     while (std::getline(file, line))
     {
         result.push_back(stof(line));
@@ -187,7 +205,6 @@ void Parser::parseConcordanceThresholdFile(const std::string &filename)
 
     this->parsedConcordanceThresholdFile = result[0];
 }
-
 
 /**
  * @brief Prints the parsed data to the console.
@@ -226,22 +243,22 @@ std::vector<float> Parser::getParsedWeight()
     return parsedWeightFile;
 }
 
-std::vector<float> Parser::getParsedVetosFile() 
+std::vector<float> Parser::getParsedVetosFile()
 {
     return parsedVetosFile;
 }
 
-std::vector<float> Parser::getParsedPreferencesFile() 
+std::vector<float> Parser::getParsedPreferencesFile()
 {
     return parsedPreferencesFile;
 }
 
-std::vector<OptimizationType> Parser::getParsedOptimizationsFile() 
+std::vector<OptimizationType> Parser::getParsedOptimizationsFile()
 {
     return parsedOptimizationsFile;
 }
 
-float Parser::getParsedConcordanceThresholdFile() 
+float Parser::getParsedConcordanceThresholdFile()
 {
     return parsedConcordanceThresholdFile;
 }
